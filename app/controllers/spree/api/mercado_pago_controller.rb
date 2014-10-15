@@ -2,8 +2,8 @@ module Spree
   module Api
     class MercadoPagoController < BaseController
 
-      before_filter :find_order
-      before_filter :verify_payment_state, only: :payment
+      include Concerns::IpnNotification
+      before_filter :find_order, :verify_payment_state, only: :payment
 
       # If the order is in 'payment' state, redirects to Mercado Pago Checkout page
       def payment
