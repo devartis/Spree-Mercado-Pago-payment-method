@@ -11,10 +11,6 @@ Spree::Core::Engine.routes.draw do
   end
 
   scope "/mercado_pago", controller: :mercado_pago do
-    get :success, as: :mercado_pago_success 
-    get :pending, as: :mercado_pago_pending 
-    get :failure, as: :mercado_pago_failure
-    post :payment, as: :mercado_pago_payment
     post :notification, as: :mercado_pago_notification
     get :notification, as: :mercado_pago_notification_get
   end
