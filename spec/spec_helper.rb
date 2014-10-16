@@ -10,6 +10,7 @@ require 'rubygems'
 require 'webmock/rspec'
 require 'webmock/api'
 
+ENV['RAILS_ENV'] = 'test'
 # Configure Rails Environment
 require File.expand_path('../dummy/config/environment.rb',  __FILE__)
 require 'rspec/rails'
