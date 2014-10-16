@@ -9,8 +9,8 @@ Spree::Core::Engine.routes.draw do
     end
     resources :payments do
       collection do
-        post :notification, to: 'mercado_pago#notification', as: :mercado_pago_notification
-        get :notification, to: 'mercado_pago#notification', as: :mercado_pago_notification_get
+        post 'mercado_pago/notification', to: 'mercado_pago#notification', as: :mercado_pago_notification
+        get 'mercado_pago/notification', to: 'mercado_pago#notification', as: :mercado_pago_notification_get
       end
     end
 
