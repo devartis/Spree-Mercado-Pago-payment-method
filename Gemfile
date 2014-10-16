@@ -3,7 +3,10 @@ source 'http://rubygems.org'
 gem 'rails', '~> 4.1.2'
 
 gem 'spree_core', :github => 'spree/spree', :branch => '2-3-stable'
-gem 'spree_frontend', :github => 'spree/spree', :branch => '2-3-stable'
+
+#spree_auth_devise requires this gems :/
+gem 'sass-rails'
+gem 'coffee-rails', '~> 4.0.0'
 gem 'spree_auth_devise', :git => 'https://github.com/spree/spree_auth_devise.git', :branch => '2-3-stable'
 
 

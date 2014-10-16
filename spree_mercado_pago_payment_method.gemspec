@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rails', '~> 4.1.2'
 
   s.add_dependency 'spree_core', '~> 2.3.0'
+  s.add_dependency 'spree_api', '~> 2.3.4'
   s.add_dependency 'rest-client'
 
   s.test_files = Dir["spec/**/*"]
