@@ -40,22 +40,21 @@ module Spree
       end
 
       def payment_method
-        @payment_method ||= ::PaymentMethod::MercadoPago.find (params[:payment_method_id])
+        @payment_method ||= if params[:payment_method_id]
+                              ::PaymentMethod::MercadoPago.find (params[:payment_method_id])
+                            else
+                              # FIXME: This is not the best way. What happens with multiples MercadoPago payments?
+                              ::PaymentMethod::MercadoPago.first
+                            end
       end
 
       def provider
-        @provider ||= payment_method.provider({:payer => payer_data})
+        @provider ||= payment_method.provider(payer_data)
       end
 
       # Get payer info for sending within Mercado Pago request
       def payer_data
-        email = get_email
-        {email: email}
-      end
-
-      # Get email for using in Mercado Pago request
-      def get_email
-        @order.email
+        @order ? {payer: {email: @order.email}} : {}
       end
 
       # Get urls callbacks.

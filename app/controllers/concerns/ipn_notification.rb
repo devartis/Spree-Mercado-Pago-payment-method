@@ -7,7 +7,7 @@ module Concerns
     end
 
     def notification
-      external_reference = simple_provider.get_external_reference operation_number
+      external_reference = provider.get_external_reference operation_number
 
       if external_reference
         payment = payment_by external_reference
@@ -43,15 +43,6 @@ module Concerns
 
     def payment_by(payment_identifier)
       @current_payment ||= Spree::Payment.find_by identifier: payment_identifier
-    end
-
-    def simple_provider
-      @provider ||= provider_payment_method.provider
-    end
-
-    def provider_payment_method
-      # FIXME: This is not the best way. What happens with multiples MercadoPago payments?
-      @payment_method ||= ::PaymentMethod::MercadoPago.first
     end
 
   end
