@@ -2,7 +2,7 @@ require 'rspec'
 require 'spec_helper'
 
 describe Spree::Api::MercadoPagoController do
-  let(:payment_method) { create(:mercado_pago_payment_method) }
+  let!(:payment_method) { create(:mercado_pago_payment_method) }
   let(:order) { Spree::Order.create(state: 'payment') }
   let(:payment) { create(:payment, payment_method: payment_method, order: order) }
 
