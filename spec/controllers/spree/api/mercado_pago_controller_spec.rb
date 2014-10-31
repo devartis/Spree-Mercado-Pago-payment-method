@@ -2,6 +2,13 @@ require 'rspec'
 require 'spec_helper'
 
 describe Spree::Api::MercadoPagoController do
+  let(:spree_api_key) do
+    user = Spree.user_class.find_or_create_by email: 'foo@example.com'
+    admin_role = Spree::Role.find_or_create_by!(name: 'admin')
+    admin_role.users << user
+    user.generate_spree_api_key!
+    user.spree_api_key
+  end
   let!(:payment_method) { create(:mercado_pago_payment_method) }
   let(:order) { Spree::Order.create(state: 'payment') }
   let(:payment) { create(:payment, payment_method: payment_method, order: order) }
@@ -9,6 +16,7 @@ describe Spree::Api::MercadoPagoController do
   #Mock MP access oauth requests
   let(:access_token) { '123456' }
   before :each do
+    subject.stub(:try_spree_current_user) { nil }
     stub_request(:post, /.*api.mercadolibre.com\/oauth\/token/).to_return(:status => 200, :body => {access_token: access_token}.to_json, :headers => {})
   end
 
@@ -19,10 +27,10 @@ describe Spree::Api::MercadoPagoController do
         expect(response).to be_ok
       end
 
-      it 'should respond an empty body' do
+      it 'should respond a json with order_number key' do
         spree_post :notification, notification_params
         #Well `render nothing: true` returns " " instead of ""
-        expect(response.body.strip).to be_empty
+        expect(JSON.parse(response.body).count).to eq(1)
       end
     end
 
@@ -31,7 +39,7 @@ describe Spree::Api::MercadoPagoController do
       let(:operation_id) { 'valid_external_reference_id' }
       let(:external_reference) { payment.identifier }
       let(:notification_response) { {collection: {external_reference: external_reference}} }
-      let(:notification_params) { {id: operation_id} }
+      let(:notification_params) { {id: operation_id, token: spree_api_key} }
       before :each do
         subject.stub(:enqueue_verification) { true }
         stub_request(:get, /.*api.mercadolibre.com.*\/notifications\/#{operation_id}.*/).to_return(:status => 200, :body => notification_response.to_json, :headers => {})
@@ -51,7 +59,7 @@ describe Spree::Api::MercadoPagoController do
     context 'invalid external reference' do
       it_behaves_like 'good responses'
       let(:operation_id) { 'invalid_external_reference_id' }
-      let(:notification_params) { {id: operation_id} }
+      let(:notification_params) { {id: operation_id, token: spree_api_key} }
       before :each do
         stub_request(:get, /.*api.mercadolibre.com.*\/notifications\/#{operation_id}.*/).to_return(:status => 404, :body => '', :headers => {})
       end
@@ -75,7 +83,7 @@ describe Spree::Api::MercadoPagoController do
     context 'invalid external reference' do
       it_behaves_like 'good responses'
       let(:operation_id) { 'valid_external_reference_id' }
-      let(:notification_params) { {id: operation_id} }
+      let(:notification_params) { {id: operation_id, token: spree_api_key} }
       let(:invalid_external_reference) { '123456789' }
       let(:notification_response) { {collection: {external_reference: invalid_external_reference}} }
       before :each do
@@ -97,7 +105,6 @@ describe Spree::Api::MercadoPagoController do
         spree_post :notification, notification_params
       end
     end
-
 
 
   end

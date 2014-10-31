@@ -7,12 +7,14 @@ module Concerns
     end
 
     def notification
+      authorize! :ipn_notification, Spree::Order
       external_reference = provider.get_external_reference operation_number
 
       if external_reference
         payment = payment_by external_reference
         if payment
           enqueue_verification payment
+          render(json: {order_number: payment.order.number}) && return
         else
           log_no_payment external_reference, operation_number
         end
@@ -20,7 +22,7 @@ module Concerns
         log_no_external_reference operation_number
       end
 
-      render status: :ok, nothing: true
+      render json: {order_number: nil}
     end
 
     private
