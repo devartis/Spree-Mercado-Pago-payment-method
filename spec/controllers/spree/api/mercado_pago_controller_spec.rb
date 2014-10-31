@@ -32,6 +32,16 @@ describe Spree::Api::MercadoPagoController do
         #Well `render nothing: true` returns " " instead of ""
         expect(JSON.parse(response.body).count).to eq(1)
       end
+      it 'should respond ok if token is not provided' do
+        spree_post :notification, notification_params.except(:token)
+        #Well `render nothing: true` returns " " instead of ""
+        expect(response).to be_ok
+      end
+      it 'should respond empty if token is not provided' do
+        spree_post :notification, notification_params.except(:token)
+        #Well `render nothing: true` returns " " instead of ""
+        expect(response.body.strip).to be_blank
+      end
     end
 
     context 'valid external reference' do

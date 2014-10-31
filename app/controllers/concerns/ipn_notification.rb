@@ -3,18 +3,19 @@ module Concerns
     extend ActiveSupport::Concern
 
     included do
+      skip_before_filter :authenticate_user, only: :notification
       skip_before_filter :verify_authenticity_token, only: :notification
     end
 
     def notification
-      authorize! :ipn_notification, Spree::Order
+      authorize! :ipn_notification, Spree::Order if api_key
       external_reference = provider.get_external_reference operation_number
 
       if external_reference
         payment = payment_by external_reference
         if payment
           enqueue_verification payment
-          render(json: {order_number: payment.order.number}) && return
+          decide_render(payment.order.number) && return
         else
           log_no_payment external_reference, operation_number
         end
@@ -22,10 +23,18 @@ module Concerns
         log_no_external_reference operation_number
       end
 
-      render json: {order_number: nil}
+      decide_render nil
     end
 
     private
+
+    def decide_render(order_number)
+      if api_key
+        render json: {order_number: order_number}
+      else
+        render nothing: true
+      end
+    end
 
     def operation_number
       params[:id]
