@@ -49,7 +49,7 @@ module Concerns
     end
 
     def enqueue_verification(payment)
-      Resque.enqueue(PaymentStatusVerifier, payment.identifier)
+      Resque.enqueue(PaymentStatusVerifier, {identifier: payment.identifier})
     end
 
     def payment_by(payment_identifier)
