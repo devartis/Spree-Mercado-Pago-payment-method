@@ -4,6 +4,8 @@ require 'spec_helper'
 describe Spree::Api::MercadoPagoController do
   let(:spree_api_key) do
     user = Spree.user_class.find_or_create_by email: 'foo@example.com'
+    user.password = 123456789
+    user.password_confirmation = 123456789
     admin_role = Spree::Role.find_or_create_by!(name: 'admin')
     admin_role.users << user
     user.generate_spree_api_key!
