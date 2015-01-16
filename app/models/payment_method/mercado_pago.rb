@@ -74,6 +74,10 @@ class PaymentMethod::MercadoPago < Spree::PaymentMethod
     payment.pending? || payment.checkout?
   end
 
+  def cancel(response_code)
+    Rails.logger.info response_code
+  end
+
   private
 
   def identifier(order_id)
