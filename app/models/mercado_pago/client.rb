@@ -64,6 +64,19 @@ class Client
     options = {:content_type => 'application/x-www-form-urlencoded', :accept => 'application/json'}
     get(url, options)
   end
+
+  def send_money_request(payer_email, amount, description)
+    url = create_url(money_request_url, access_token: access_token)
+    headers = {:content_type => 'application/json', :accept => 'application/json'}
+    params = {
+        currency_id: 'ARS',
+        payer_email: payer_email,
+        amount: amount,
+        description: description,
+        concept_type: 'off_platform'}.to_json
+    post url, params, headers
+    ActiveSupport::JSON.decode(response)
+  end
 end
 
 end
