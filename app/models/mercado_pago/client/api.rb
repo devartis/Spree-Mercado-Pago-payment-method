@@ -17,6 +17,11 @@ class MercadoPago::Client
       "https://api.mercadolibre.com/#{sandbox_part}collections/search"
     end
 
+    def money_request_url(mercado_pago_id = nil)
+      default_url = "https://api.mercadolibre.com/money_requests"
+      mercado_pago_id ? "#{default_url}/#{mercado_pago_id}" : default_url
+    end
+
     def create_url(url, params={})
       uri = URI(url)
       uri.query = URI.encode_www_form(params)
