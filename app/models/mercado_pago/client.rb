@@ -61,7 +61,27 @@ module MercadoPago
       get(url, options)
     end
 
-    def send_money_request(payer_email, amount, description)
+    # https://developers.mercadopago.com/documentacion/solicitar-dinero#!/post
+    # Should return a json with this format
+    # {
+    #     "id": 1234567,
+    #     "status": "pending",
+    #     "site_id": "Sitio del pago",
+    #     "currency_id": "Tipo de moneda",
+    #     "amount": 2.1,
+    #     "collector_id": tu_identificador_como_vendedor,
+    #     "collector_email": "collector@email.com",
+    #     "payer_id": identificador_de_tu_comprador,
+    #     "payer_email": "payer@email.com",
+    #     "description": "Descripción",
+    #     "concept_type": "off_platform",
+    #     "init_point": "URL-de-acceso-al-checkout",
+    #     "external_reference": "Reference_1234",
+    #     "pref_id": "identificador_de_la_preferencia",
+    #     "date_created": "2014-04-24T16:37:22.032-04:00",
+    #     "last_updated": "2014-04-24T16:37:22.032-04:00"
+    # }
+    def send_create_money_request(payer_email, amount, description)
       url = create_url(money_request_url, access_token: access_token)
       headers = {:content_type => 'application/json', :accept => 'application/json'}
       params = {
@@ -72,7 +92,14 @@ module MercadoPago
           concept_type: 'off_platform'
       }
       post url, params, headers
-      ActiveSupport::JSON.decode(response)
+    end
+
+    # https://developers.mercadopago.com/documentacion/solicitar-dinero#!/get
+    # Should return a json just like send_create_money_request
+    def send_search_money_request(mercado_pago_id)
+      url = create_url(money_request_url(mercado_pago_id), access_token: access_token)
+      headers = { :accept => 'application/json' }
+      get url, headers
     end
   end
 end
