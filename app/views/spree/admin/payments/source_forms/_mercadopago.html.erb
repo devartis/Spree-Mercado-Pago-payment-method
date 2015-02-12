@@ -1,7 +1,3 @@
 <!-- Source form -->
 <% param_prefix = "payment_source[#{payment_method.id}]" %>
-<div class="row">
-  <div class="alpha six columns">
-    <%= text_field_tag 'param_prefix[payer_email]', @order.email, class: 'required fullwidth' %>
-  </div>
-</div>
+<%= text_field_tag "#{param_prefix}[payer_email]", @order.email, class: 'required fullwidth' %>
