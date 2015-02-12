@@ -1,4 +1,4 @@
-class PaymentMethod::MercadoPagoMoneyRequest < Spree::PaymentMethod
+class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
 
   preference :client_id, :string
   preference :client_secret, :string
@@ -25,7 +25,7 @@ class PaymentMethod::MercadoPagoMoneyRequest < Spree::PaymentMethod
     nil
   end
 
-  def authorize(amount, response_code, gateway_options)
+  def authorize(amount, source, gateway_options)
     ActiveMerchant::Billing::Response.new(true, 'MercadoPagoMoneyRequest payment authorized', {})
   end
 
