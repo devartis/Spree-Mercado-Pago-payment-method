@@ -22,7 +22,7 @@ class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
   end
 
   def payment_source_class
-    nil
+    MercadoPagoManualSource
   end
 
   def authorize(amount, source, gateway_options)
