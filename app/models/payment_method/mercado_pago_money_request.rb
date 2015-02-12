@@ -29,16 +29,28 @@ class PaymentMethod::MercadoPagoMoneyRequest < Spree::PaymentMethod
     ActiveMerchant::Billing::Response.new(true, 'MercadoPagoMoneyRequest payment authorized', {})
   end
 
+  def try_capture(payment)
+    response = provider.transaction_information(payment.source.transaction_id)
+    if can_capture?(payment) && accepted?(response)
+      begin
+        payment.capture!
+      rescue ::Spree::Core::GatewayError => e
+        Rails.logger.error e.message
+      end
+    end
+  end
+
   private
-  def pending?(status)
-    status == 'pending'
+
+  def pending?(response)
+    response['status'] == 'pending'
   end
 
-  def failed?(status)
-    status == 'rejected' or status == 'cancelled'
+  def failed?(response)
+    ['rejected', 'cancelled'].include? response['status']
   end
 
-  def accepted?(status)
-    status == 'accepted'
+  def accepted?(response)
+    response['status'] == 'accepted'
   end
 end
