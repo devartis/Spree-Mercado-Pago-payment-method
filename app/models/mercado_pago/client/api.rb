@@ -42,5 +42,13 @@ class MercadoPago::Client
     rescue => e
       raise e unless options[:quiet]
     end
+
+    def post(url, params={}, headers={}, options={})
+      params = params.to_json if ['application/json', :json].include? headers[:content_type]
+      response = RestClient.post url, params, headers
+      ActiveSupport::JSON.decode(response)
+    rescue => e
+      raise e unless options[:quiet]
+    end
   end
 end
