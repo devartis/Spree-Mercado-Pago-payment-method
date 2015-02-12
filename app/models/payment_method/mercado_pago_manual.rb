@@ -1,4 +1,4 @@
-class Spree::PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
+class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
 
   preference :client_id, :string
   preference :client_secret, :string
@@ -31,7 +31,7 @@ class Spree::PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
 
   def try_capture(payment)
     response = provider.get_money_request_status(payment.source.mercado_pago_id)
-    if can_capture?(payment)  and not pending?(response)
+    if can_capture?(payment) and not pending?(response)
       begin
         payment.capture!
       rescue ::Spree::Core::GatewayError => e
