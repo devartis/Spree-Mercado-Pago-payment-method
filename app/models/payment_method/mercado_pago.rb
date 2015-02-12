@@ -10,21 +10,14 @@ class PaymentMethod::MercadoPago < Spree::PaymentMethod
   preference :sandbox, :boolean, default: true
   preference :confirmation_url, :string, default: ''
 
+  include Provider
+
+  def default_options
+    { sandbox: preferred_sandbox }
+  end
+
   def payment_profiles_supported?
     false
-  end
-
-  def provider_class
-    ::MercadoPago::Client
-  end
-
-  def provider(additional_options={})
-    options = {
-      sandbox: preferred_sandbox
-    }
-    client = provider_class.new(self, options.merge(additional_options))
-    client.authenticate
-    client
   end
 
   def auto_capture?
