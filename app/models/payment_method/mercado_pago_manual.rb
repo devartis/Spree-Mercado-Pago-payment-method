@@ -1,4 +1,4 @@
-class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
+class Spree::PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
 
   preference :client_id, :string
   preference :client_secret, :string
