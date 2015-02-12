@@ -40,6 +40,16 @@ module MercadoPago
       end
     end
 
+    # Returns any of these status: 'pending', 'accepted', 'rejected', 'cancelled'
+    def get_money_request_status(mercado_pago_id)
+      response = send_search_money_request(mercado_pago_id)
+      response['status'] if response
+    end
+
+    def create_money_request(payer_email, amount, description)
+      send_create_money_request(payer_email, amount, description)
+    end
+
     private
 
     def log_error(msg, response, request, result)
@@ -99,7 +109,7 @@ module MercadoPago
     def send_search_money_request(mercado_pago_id)
       url = create_url(money_request_url(mercado_pago_id), access_token: access_token)
       headers = { :accept => 'application/json' }
-      get url, headers
+      get url, headers, quiet: true
     end
   end
 end
