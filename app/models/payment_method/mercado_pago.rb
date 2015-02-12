@@ -25,11 +25,7 @@ class PaymentMethod::MercadoPago < Spree::PaymentMethod
   end
 
   def payment_source_class
-    MercadoPagoSource
-  end
-
-  def confirmation_url
-    preferred_confirmation_url
+    nil
   end
 
   def authorize(amount, source, gateway_options)
