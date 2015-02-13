@@ -35,8 +35,8 @@ class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
   end
 
   def try_capture(payment)
-    response = provider.get_money_request_status(payment.source.mercado_pago_id)
-    if can_capture?(payment) and not pending?(response)
+    status = provider.get_money_request_status(payment.source.mercado_pago_id)
+    if can_capture?(payment) and not pending?(status)
       begin
         payment.capture!
       rescue ::Spree::Core::GatewayError => e
@@ -46,8 +46,8 @@ class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
   end
 
   def capture(amount, source, gateway_options)
-    response = provider.get_money_request_status source.mercado_pago_id
-    success = accepted?(response)
+    status = provider.get_money_request_status source.mercado_pago_id
+    success = accepted?(status)
     ActiveMerchant::Billing::Response.new(success, 'MercadoPago payment processed', {status: status})
   end
 
@@ -56,15 +56,16 @@ class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
   def identifier(order_id)
     order_id.split('-').last
   end
-  def pending?(response)
-    response['status'] == 'pending'
+
+  def pending?(status)
+    status == 'pending'
   end
 
-  def failed?(response)
-    ['rejected', 'cancelled'].include? response['status']
+  def failed?(status)
+    ['rejected', 'cancelled'].include? status
   end
 
-  def accepted?(response)
-    response['status'] == 'accepted'
+  def accepted?(status)
+    status == 'accepted'
   end
 end
