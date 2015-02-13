@@ -39,7 +39,7 @@ class MercadoPago::Client
     def get(url, request_options={}, options={})
       response = RestClient.get(url, request_options)
       ActiveSupport::JSON.decode(response)
-    rescue => e
+    rescue RestClient::Exception => e
       raise e unless options[:quiet]
     end
 
@@ -47,7 +47,7 @@ class MercadoPago::Client
       params = params.to_json if ['application/json', :json].include? headers[:content_type]
       response = RestClient.post url, params, headers
       ActiveSupport::JSON.decode(response)
-    rescue => e
+    rescue RestClient::Exception => e
       raise e unless options[:quiet]
     end
   end
