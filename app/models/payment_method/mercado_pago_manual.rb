@@ -38,6 +38,9 @@ class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
   end
 
   # TODO: Fix this If the MoneyRequestState returns accepted, then we have to check for the PaymentState, if it's not pending then DO capture.
+  # If the money_request_status is pending, then don't capture yet
+  # If the money_request_status is accepted, then check the payment_state, if the payment_state is not pending, then capture
+  # If the money_request_status is cancelled or rejected, then capture
   def try_capture(payment)
     status = provider.get_money_request_status(payment.source.mercado_pago_id)
     if can_capture?(payment) and not MercadoPago::MoneyRequestStatus.pending?(status)
