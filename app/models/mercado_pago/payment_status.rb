@@ -1,4 +1,4 @@
-class MercadoPago::PaymentState
+class MercadoPago::PaymentStatus
   def self.pending?(status)
     status == 'pending' or status == 'in_process' or status == 'in_mediation'
   end
