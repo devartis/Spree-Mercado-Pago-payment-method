@@ -6,6 +6,7 @@ class CreateMercadoPagoManualSources < ActiveRecord::Migration
       t.string  :external_reference
       t.integer :user_id
       t.integer :payment_method_id
+      t.text :description
 
       t.timestamps
     end
