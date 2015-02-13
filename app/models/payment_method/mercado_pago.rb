@@ -30,20 +30,20 @@ class PaymentMethod::MercadoPago < Spree::PaymentMethod
 
   def authorize(amount, source, gateway_options)
     status = provider.get_payment_status identifier(gateway_options[:order_id])
-    success = !failed?(status)
+    success = !MercadoPago::PaymentState.failed?(status)
     ActiveMerchant::Billing::Response.new(success, 'MercadoPago payment authorized', {status: status})
   end
 
   def capture(amount, source, gateway_options)
     status = provider.get_payment_status identifier(gateway_options[:order_id])
-    success = approved?(status)
+    success = MercadoPago::PaymentState.approved?(status)
     ActiveMerchant::Billing::Response.new(success, 'MercadoPago payment processed', {status: status})
   end
 
   def try_capture payment
     status = provider.get_payment_status payment.identifier
 
-    if can_capture?(payment) and not pending?(status)
+    if can_capture?(payment) and not MercadoPago::PaymentState.pending?(status)
       # When the capture is not success, the payment raises a Core::GatewayError exception
       # See spree_core/app/models/spree/payment/processing.rb:156
       begin
@@ -56,7 +56,7 @@ class PaymentMethod::MercadoPago < Spree::PaymentMethod
 
   def payment_approved?(payment)
     status = provider.get_payment_status payment.identifier
-    approved?(status)
+    MercadoPago::PaymentState.approved?(status)
   end
 
   def can_void?(payment)
@@ -75,18 +75,6 @@ class PaymentMethod::MercadoPago < Spree::PaymentMethod
 
   def identifier(order_id)
     order_id.split('-')[1]
-  end
-
-  def pending?(status)
-    status == 'pending' or status == 'in_process' or status == 'in_mediation'
-  end
-
-  def failed?(status)
-    status == 'rejected' or status == 'cancelled'
-  end
-
-  def approved?(status)
-    status == 'approved'
   end
 
 end
