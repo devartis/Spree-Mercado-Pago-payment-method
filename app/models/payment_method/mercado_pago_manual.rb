@@ -26,6 +26,10 @@ class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
   end
 
   def authorize(amount, source, gateway_options)
+    response = provider.send_create_money_request(source.payer_email, amount, source.description)
+    source.mercado_pago_id = response['id'].try(:to_i)
+    source.external_reference = response['external_reference']
+    source.save!
     ActiveMerchant::Billing::Response.new(true, 'MercadoPagoMoneyRequest payment authorized', {})
   end
 
