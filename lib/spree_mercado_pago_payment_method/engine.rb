@@ -19,6 +19,9 @@ module SpreeMercadoPagoPaymentMethod
       app.config.spree.payment_methods += [PaymentMethod::MercadoPagoManual]
     end
 
+    Spree::PermittedAttributes.source_attributes << :payer_email
+    Spree::PermittedAttributes.source_attributes << :description
+
     config.to_prepare &method(:activate).to_proc
   end
 end
