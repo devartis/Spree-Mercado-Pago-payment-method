@@ -26,7 +26,8 @@ class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
   end
 
   def authorize(amount, source, gateway_options)
-    response = provider.create_money_request(source.payer_email, amount, source.description)
+    formatted_amount = amount.to_f / 100
+    response = provider.create_money_request(source.payer_email, formatted_amount, source.description)
     source.mercado_pago_id = response['id'].try(:to_i)
     source.external_reference = response['external_reference']
     source.save!
@@ -52,6 +53,9 @@ class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
 
   private
 
+  def identifier(order_id)
+    order_id.split('-').last
+  end
   def pending?(response)
     response['status'] == 'pending'
   end
