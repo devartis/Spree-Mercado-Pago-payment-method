@@ -37,26 +37,36 @@ class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
     ActiveMerchant::Billing::Response.new(success, 'MercadoPagoMoneyRequest payment authorized', {status: status})
   end
 
-  # TODO: Fix this If the MoneyRequestState returns accepted, then we have to check for the PaymentState, if it's not pending then DO capture.
   # If the money_request_status is pending, then don't capture yet
-  # If the money_request_status is accepted, then check the payment_state, if the payment_state is not pending, then capture
-  # If the money_request_status is cancelled or rejected, then capture
+  # If the money_request_status is accepted and the payment_status is not pending, then capture
+  # If the money_request_status is cancelled or rejected (#failed?), then capture
   def try_capture(payment)
-    status = provider.get_money_request_status(payment.source.mercado_pago_id)
-    if can_capture?(payment) and not MercadoPago::MoneyRequestStatus.pending?(status)
-      payment.source.update(status: status)
-      begin
-        payment.capture!
-      rescue ::Spree::Core::GatewayError => e
-        Rails.logger.error e.message
+    money_request_status = provider.get_money_request_status(payment.source.mercado_pago_id)
+    if can_capture?(payment) and not MercadoPago::MoneyRequestStatus.pending?(money_request_status)
+      payment.source.update(status: money_request_status)
+      payment_status = provider.get_payment_status payment.source.external_reference
+      if MercadoPago::MoneyRequestStatus.failed? money_request_status or
+          (MercadoPago::MoneyRequestStatus.accepted? money_request_status and
+              not MercadoPago::PaymentStatus.pending? payment_status)
+        begin
+          payment.capture!
+        rescue ::Spree::Core::GatewayError => e
+          Rails.logger.error e.message
+        end
       end
     end
   end
 
   def capture(amount, source, gateway_options)
-    status = provider.get_money_request_status source.mercado_pago_id
-    success = MercadoPago::MoneyRequestStatus.accepted?(status)
-    ActiveMerchant::Billing::Response.new(success, 'MercadoPago payment processed', {status: status})
+    money_request_status = provider.get_money_request_status source.mercado_pago_id
+    success = MercadoPago::MoneyRequestStatus.accepted?(money_request_status)
+    if success
+      payment_status = provider.get_payment_status payment.source.external_reference
+      success &&= MercadoPago::PaymentStatus.approved?(payment_status)
+      ActiveMerchant::Billing::Response.new(success, 'MercadoPago Money Request payment processed', {status: payment_status})
+    else
+      ActiveMerchant::Billing::Response.new(success, 'MercadoPago Money Request payment processed', {status: money_request_status})
+    end
   end
 
   private
