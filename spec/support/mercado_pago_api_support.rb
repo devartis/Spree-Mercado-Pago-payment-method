@@ -1,6 +1,6 @@
 module MercadoPagoApiSupport
   def mock_authenticate(client_id, client_secret)
-    headers = default_api_headers.merge({ 'Content-Length' => '63', 'Content-Type' => 'application/x-www-form-urlencoded' })
+    headers = default_api_headers.merge({'Content-Length' => '63', 'Content-Type' => 'application/x-www-form-urlencoded'})
     mock_api_call mercado_pago_api_url, '/oauth/token',
                   headers: headers,
                   method: :post,
@@ -12,8 +12,11 @@ module MercadoPagoApiSupport
     response ||= money_request_json
     access_token = JSON.parse(authenticated_json, symbolize_names: true)[:access_token]
     mock_api_call mercado_pago_api_url, "/money_requests/#{money_request_id}?access_token=#{access_token}",
-                  method: :get,
                   return_body: money_request_json
+  end
+
+  def mock_get_payment_status(status = 'pending')
+    mock_api_call mercado_pago_api_url, '/collections/search', return_body: status
   end
 
   def money_request_json(status = nil)
