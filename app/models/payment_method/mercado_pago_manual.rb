@@ -43,7 +43,6 @@ class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
   def try_capture(payment)
     money_request_status = provider.get_money_request_status(payment.source.mercado_pago_id)
     if can_capture?(payment) and not MercadoPago::MoneyRequestStatus.pending?(money_request_status)
-      payment.source.update(status: money_request_status)
       payment_status = provider.get_payment_status payment.source.external_reference
       if MercadoPago::MoneyRequestStatus.failed? money_request_status or
           (MercadoPago::MoneyRequestStatus.accepted? money_request_status and
