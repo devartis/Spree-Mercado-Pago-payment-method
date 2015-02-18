@@ -22,8 +22,16 @@ describe PaymentMethod::MercadoPagoManual do
     before(:each) { mock_get_money_request payment.source.mercado_pago_id, 'accepted' }
 
     context 'with a pending mercado pago payment' do
-      before(:each) { mock_get_payment_status }
+      before(:each) { mock_get_payment_status 'pending', payment.source.external_reference }
       include_examples 'should not be captured'
+    end
+
+    context 'with an approved mercado pago payment' do
+      before(:each) { mock_get_payment_status 'approved', payment.source.external_reference }
+      it 'should be captured' do
+        payment.should_receive(:capture!)
+        subject.try_capture(payment)
+      end
     end
   end
 end
