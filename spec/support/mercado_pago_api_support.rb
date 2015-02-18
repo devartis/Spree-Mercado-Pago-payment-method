@@ -9,6 +9,6 @@ module MercadoPagoApiSupport
   private
 
   def authenticated_json
-    File.open("#{SPEC_ROOT}/../fixtures/authenticated.json", 'r').read
+    File.open("#{::Rails.root.to_s}/../fixtures/authenticated.json", 'r').read
   end
 end
