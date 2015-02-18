@@ -8,24 +8,33 @@ module MercadoPagoApiSupport
                   return_body: authenticated_json
   end
 
-  def mock_get_money_request(money_request_id, response = nil)
-    response ||= money_request_json
-    access_token = JSON.parse(authenticated_json, symbolize_names: true)[:access_token]
+  def mock_get_money_request(money_request_id, status = nil)
+    response = money_request_json(status)
     mock_api_call mercado_pago_api_url, "/money_requests/#{money_request_id}?access_token=#{access_token}",
-                  return_body: money_request_json
+                  return_body: response
   end
 
-  def mock_get_payment_status(status = 'pending')
-    mock_api_call mercado_pago_api_url, '/collections/search', return_body: status
+  def mock_get_payment_status(status = 'pending', external_reference)
+    return_body = { results: {:'0' => { collection: { status: status } } } }.to_json.to_s
+    mock_api_call mercado_pago_api_url, "/collections/search?access_token=#{access_token}&external_reference=#{external_reference}",
+                  return_body: return_body,
+                  headers: {'Content-Type' => 'application/x-www-form-urlencoded', 'Accept' => 'application/json', 'Accept-Encoding'=>'gzip, deflate', 'User-Agent'=>'Ruby'}
   end
 
   def money_request_json(status = nil)
     money_request = open_fixture('money_request.json')
-    money_request[:status] = status if status
-    money_request
+    if status
+      money_request = JSON.parse(money_request, symbolize_names: true)
+      money_request[:status] = status
+    end
+    money_request.to_s
   end
 
   private
+
+  def access_token
+    JSON.parse(authenticated_json, symbolize_names: true)[:access_token]
+  end
 
   def mock_api_call(host, path, options={})
     headers = options[:headers] || default_api_headers
