@@ -18,40 +18,39 @@ describe PaymentMethod::MercadoPagoManual do
   let (:payment) { create :mp_manual_payment }
   subject { payment.payment_method }
 
-  before(:each) { mock_authenticate subject.preferred_client_id, subject.preferred_client_secret }
+  before(:each) do
+    mock_authenticate subject.preferred_client_id, subject.preferred_client_secret
+    mock_get_money_request payment.source.mercado_pago_id, money_request_status
+    mp_payment_status = (defined? mercado_pago_payment_status) ? mercado_pago_payment_status : nil
+    mock_get_payment_status payment.source.external_reference, mp_payment_status
+  end
 
   context 'with a pending money request' do
-    before(:each) { mock_get_money_request payment.source.mercado_pago_id, 'pending' }
+    let(:money_request_status) { 'pending' }
     include_examples 'should not be captured'
   end
 
   context 'with an accepted money request' do
-    before(:each) { mock_get_money_request payment.source.mercado_pago_id, 'accepted' }
+    let(:money_request_status) { 'accepted' }
 
     context 'with a pending mercado pago payment' do
-      before(:each) { mock_get_payment_status payment.source.external_reference, 'pending' }
+      let(:mercado_pago_payment_status) { 'pending' }
       include_examples 'should not be captured'
     end
 
     context 'with an approved mercado pago payment' do
-      before(:each) { mock_get_payment_status payment.source.external_reference, 'approved' }
+      let(:mercado_pago_payment_status) { 'approved' }
       include_examples 'should be captured'
     end
   end
 
   context 'with a cancelled money request' do
-    before(:each) do
-      mock_get_payment_status payment.source.external_reference
-      mock_get_money_request payment.source.mercado_pago_id, 'cancelled'
-    end
+    let(:money_request_status) { 'cancelled' }
     include_examples 'should be captured'
   end
 
   context 'with a rejected money request' do
-    before(:each) do
-      mock_get_payment_status payment.source.external_reference
-      mock_get_money_request payment.source.mercado_pago_id, 'rejected'
-    end
+    let(:money_request_status) { 'rejected' }
     include_examples 'should be captured'
   end
 end

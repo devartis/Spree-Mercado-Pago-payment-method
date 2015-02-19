@@ -9,17 +9,19 @@ module MercadoPagoApiSupport
   end
 
   def mock_get_money_request(money_request_id, status = nil)
-    response = money_request_json(status)
     mock_api_call build_mercado_pago_api_url("/money_requests/#{money_request_id}?access_token=#{access_token}"),
-                  return_body: response
+                  return_body: money_request_json(status)
   end
 
   def mock_get_payment_status(external_reference, status = nil)
-    return_body = (status ? { results: [{ collection: { status: status } }] }: { results: [] }).to_json
     mock_api_call build_mercado_pago_api_url("/collections/search?access_token=#{access_token}&external_reference=#{external_reference}"),
-                  return_body: return_body,
-                  headers: {'Content-Type' => 'application/x-www-form-urlencoded', 'Accept' => 'application/json', 'Accept-Encoding'=>'gzip, deflate', 'User-Agent'=>'Ruby'}
+                  return_body: payment_request_json(status),
+                  headers: {'Content-Type' => 'application/x-www-form-urlencoded', 'Accept' => 'application/json',
+                            'Accept-Encoding' => 'gzip, deflate', 'User-Agent' => 'Ruby'}
   end
+
+
+  private
 
   def money_request_json(status = nil)
     money_request = open_fixture('money_request.json')
@@ -30,7 +32,10 @@ module MercadoPagoApiSupport
     money_request.to_json
   end
 
-  private
+  def payment_request_json(status = nil)
+    hash = status ? {results: [{collection: {status: status}}]} : {results: []}
+    hash.to_json
+  end
 
   def build_mercado_pago_api_url(endpoint)
     "#{mercado_pago_api_url}#{endpoint}"
