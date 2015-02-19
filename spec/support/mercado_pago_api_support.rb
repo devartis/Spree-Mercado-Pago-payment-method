@@ -27,7 +27,7 @@ module MercadoPagoApiSupport
       money_request = JSON.parse(money_request, symbolize_names: true)
       money_request[:status] = status
     end
-    money_request.to_s
+    money_request.to_json
   end
 
   private
