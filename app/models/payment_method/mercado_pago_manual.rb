@@ -29,10 +29,7 @@ class PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
     formatted_amount = amount.to_f / 100
     money_request = provider.create_money_request(source.payer_email, formatted_amount, source.description)
     status = money_request['status']
-    source.status = status
-    source.mercado_pago_id = money_request['id'].try(:to_i)
-    source.external_reference = money_request['external_reference']
-    source.save!
+    source.update!(mercado_pago_id: money_request['id'].try(:to_i), external_reference: money_request['external_reference'])
     success = !MercadoPago::MoneyRequestStatus.failed?(status)
     ActiveMerchant::Billing::Response.new(success, 'MercadoPagoMoneyRequest payment authorized', {status: status})
   end
