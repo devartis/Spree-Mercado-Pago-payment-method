@@ -14,8 +14,8 @@ module MercadoPagoApiSupport
                   return_body: response
   end
 
-  def mock_get_payment_status(external_reference, status = 'pending')
-    return_body = { results: [{ collection: { status: status } }] }.to_json.to_s
+  def mock_get_payment_status(external_reference, status = nil)
+    return_body = (status ? { results: [{ collection: { status: status } }] }: { results: [] }).to_json
     mock_api_call mercado_pago_api_url, "/collections/search?access_token=#{access_token}&external_reference=#{external_reference}",
                   return_body: return_body,
                   headers: {'Content-Type' => 'application/x-www-form-urlencoded', 'Accept' => 'application/json', 'Accept-Encoding'=>'gzip, deflate', 'User-Agent'=>'Ruby'}
