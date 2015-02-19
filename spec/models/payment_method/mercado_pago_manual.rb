@@ -7,6 +7,13 @@ shared_examples 'should not be captured' do
   end
 end
 
+shared_examples 'should be captured' do
+  it 'should be captured' do
+    payment.should_receive(:capture!)
+    subject.try_capture(payment)
+  end
+end
+
 describe PaymentMethod::MercadoPagoManual do
   let (:payment) { create :mp_manual_payment }
   subject { payment.payment_method }
@@ -28,10 +35,23 @@ describe PaymentMethod::MercadoPagoManual do
 
     context 'with an approved mercado pago payment' do
       before(:each) { mock_get_payment_status payment.source.external_reference, 'approved' }
-      it 'should be captured' do
-        payment.should_receive(:capture!)
-        subject.try_capture(payment)
-      end
+      include_examples 'should be captured'
     end
+  end
+
+  context 'with a cancelled money request' do
+    before(:each) do
+      mock_get_payment_status payment.source.external_reference
+      mock_get_money_request payment.source.mercado_pago_id, 'cancelled'
+    end
+    include_examples 'should be captured'
+  end
+
+  context 'with a rejected money request' do
+    before(:each) do
+      mock_get_payment_status payment.source.external_reference
+      mock_get_money_request payment.source.mercado_pago_id, 'rejected'
+    end
+    include_examples 'should be captured'
   end
 end
