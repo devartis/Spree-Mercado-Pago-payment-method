@@ -9,7 +9,7 @@ gem 'spree_api'
 gem 'sass-rails'
 gem 'coffee-rails', '~> 4.0.0'
 gem 'spree_auth_devise', :git => 'https://github.com/spree/spree_auth_devise.git', :branch => '2-3-stable'
-
+gem 'mercadopago-sdk'
 
 group :test do
   gem 'webmock'
