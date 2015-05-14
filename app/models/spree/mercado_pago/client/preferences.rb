@@ -1,4 +1,4 @@
-class MercadoPago::Client
+class Spree::MercadoPago::Client
   module Preferences
 
     def create_preferences(preferences)

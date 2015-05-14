@@ -8,7 +8,7 @@ module Spree
       # If the order is in 'payment' state, redirects to Mercado Pago Checkout page
       def payment
         mp_payment = @order.current_payment
-        mp_payment.source = MercadoPagoSource.create!
+        mp_payment.source = Spree::MercadoPagoSource.create!
         mp_payment.save!
 
         if create_preferences(mp_payment)
@@ -41,10 +41,10 @@ module Spree
 
       def payment_method
         @payment_method ||= if params[:payment_method_id]
-                              ::PaymentMethod::MercadoPago.find (params[:payment_method_id])
+                              ::Spree::PaymentMethod::MercadoPago.find (params[:payment_method_id])
                             else
                               # FIXME: This is not the best way. What happens with multiples MercadoPago payments?
-                              ::PaymentMethod::MercadoPago.first
+                              ::Spree::PaymentMethod::MercadoPago.first
                             end
       end
 

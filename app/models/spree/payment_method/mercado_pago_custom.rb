@@ -1,4 +1,4 @@
-class PaymentMethod::MercadoPago::CustomCheckout < Spree::PaymentMethod
+class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   preference :app_name, :string
   preference :public_key_production, :string
   preference :access_token_production, :string
@@ -8,10 +8,19 @@ class PaymentMethod::MercadoPago::CustomCheckout < Spree::PaymentMethod
 
   scope :active, -> { where(active: true) }
 
-  include ::MercadoPago::CustomCheckout::PaymentIntegration
-
   def payment_source_class
-    ::MercadoPago::CustomCheckout::Source
+    ::Spree::MercadoPagoCustomSource
+  end
+
+  def purchase(amount, source, gateway_options)
+  end
+
+  def provider_source_class
+    ::Spree::MercadoPago::CustomClient
+  end
+
+  def provider
+    provider_class.new self.access_token
   end
 
   def auto_capture?

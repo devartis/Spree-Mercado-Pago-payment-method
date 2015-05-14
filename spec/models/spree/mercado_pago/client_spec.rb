@@ -1,24 +1,24 @@
 # -*- encoding : utf-8 -*-
 require 'spec_helper'
 
-describe MercadoPago::Client do
-  SPEC_ROOT = File.expand_path('../', File.dirname(__FILE__))
+describe Spree::MercadoPago::Client do
+  SPEC_ROOT = File.expand_path('../../', File.dirname(__FILE__))
 
   let(:payment_method) do
     double(
-      'payment_method',
-      :preferred_client_id => 1,
-      :preferred_client_secret => 1
+        'payment_method',
+        :preferred_client_id => 1,
+        :preferred_client_secret => 1
     )
   end
 
 
   let(:order) { double('order', payment_method: payment_method, number: 'testorder', line_items: [], ship_total: 1000) }
   let(:url_callbacks) { {success: 'url', failure: 'url', pending: 'url'} }
-  
+
   let(:payment_method) { double :payment_method, id: 1, preferred_client_id: 'app id', preferred_client_secret: 'app secret' }
-  let(:payment) {double :payment, payment_method:payment_method, id:1, identifier:"fruta" }
-  let(:login_json_response)  do
+  let(:payment) { double :payment, payment_method: payment_method, id: 1, identifier: "fruta" }
+  let(:login_json_response) do
     File.open("#{SPEC_ROOT}/../fixtures/authenticated.json", 'r').read
   end
 
@@ -26,12 +26,12 @@ describe MercadoPago::Client do
     File.open("#{SPEC_ROOT}/../fixtures/preferences_created.json", 'r').read
   end
 
-  let(:client) {MercadoPago::Client.new(payment_method)}
+  let(:client) { Spree::MercadoPago::Client.new(payment_method) }
 
   describe '#initialize' do
 
     it "doesn't raise error with all params" do
-      expect {client}.not_to raise_error
+      expect { client }.not_to raise_error
     end
   end
 
@@ -42,11 +42,11 @@ describe MercadoPago::Client do
         response.stub(:code) { 200 }
         response.stub(:to_str) { login_json_response }
         response
-        }
-      let(:js_response) {ActiveSupport::JSON.decode(http_response)}
+      }
+      let(:js_response) { ActiveSupport::JSON.decode(http_response) }
 
       before(:each) do
-        expect(RestClient).to receive(:post).and_return( http_response )
+        expect(RestClient).to receive(:post).and_return(http_response)
       end
 
 
@@ -73,7 +73,7 @@ describe MercadoPago::Client do
         response
       end
 
-      before(:each) do  
+      before(:each) do
         RestClient.should_receive(:post) { raise RestClient::Exception.new "foo" }
       end
 
@@ -98,7 +98,7 @@ describe MercadoPago::Client do
   describe '#create_preferences' do
 
     context 'On success' do
-      let(:preferences) { {foo:"bar"} }
+      let(:preferences) { {foo: "bar"} }
       before(:each) do
         response = double('response')
         response.stub(:code).and_return(200, 201)
@@ -133,12 +133,12 @@ describe MercadoPago::Client do
         end
         client.authenticate
       end
-      
-      let(:preferences) {{foo:"bar"}}
+
+      let(:preferences) { {foo: "bar"} }
 
       it 'throws exception and populate errors' do
 
-        expect {client.create_preferences(preferences)}.to raise_error(RuntimeError) do |variable|
+        expect { client.create_preferences(preferences) }.to raise_error(RuntimeError) do |variable|
           client.errors.should include(I18n.t(:mp_authentication_error))
         end
       end

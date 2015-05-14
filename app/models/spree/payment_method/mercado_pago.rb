@@ -1,5 +1,4 @@
-# -*- encoding : utf-8 -*-
-class PaymentMethod::MercadoPago < Spree::PaymentMethod
+class Spree::PaymentMethod::MercadoPago < Spree::PaymentMethod
 
   preference :client_id, :string
   preference :client_secret, :string
@@ -10,10 +9,10 @@ class PaymentMethod::MercadoPago < Spree::PaymentMethod
   preference :sandbox, :boolean, default: true
   preference :confirmation_url, :string, default: ''
 
-  include Provider
+  include ::Spree::MercadoPago::Provider
 
   def default_options
-    { sandbox: preferred_sandbox }
+    {sandbox: preferred_sandbox}
   end
 
   def payment_profiles_supported?

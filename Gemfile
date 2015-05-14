@@ -2,8 +2,8 @@ source 'http://rubygems.org'
 
 gem 'rails', '~> 4.1.2'
 
-gem 'spree_core', :github => 'spree/spree', :branch => '2-3-stable'
-gem 'spree_api'
+gem 'spree_core', '2.3.2'
+gem 'spree_api', '2.3.2'
 
 #spree_auth_devise requires this gems :/
 gem 'sass-rails'
@@ -15,7 +15,7 @@ group :test do
   gem 'webmock'
   gem 'guard-rspec', '~> 4.0.0'
   gem 'capybara'
-  gem 'rspec-rails', '~> 2.14.0'
+  gem 'rspec-rails', '~> 2.99.0'
 end
 
 group :development, :test do
@@ -28,12 +28,6 @@ end
 
 group :development do
   gem 'annotate', '>=2.6.0'
-  unless ENV['RM_INFO']
-    gem 'pry-debugger'
-    gem 'pry-rails'
-    gem 'pry-rescue'
-    gem 'pry-stack_explorer'
-  end
 end
 
 gemspec
