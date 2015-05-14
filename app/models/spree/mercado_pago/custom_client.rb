@@ -9,6 +9,9 @@ module Spree
         @client = ::MercadoPago.new(access_token)
       end
 
+      def payments
+        CustomClient::Payments.new(self.client)
+      end
     end
   end
 end
