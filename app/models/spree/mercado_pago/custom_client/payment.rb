@@ -1,4 +1,4 @@
-class Spree::MercadoPago::CustomClient::Payments < Spree::MercadoPago::CustomClient::Resource
+class Spree::MercadoPago::CustomClient::Payment < Spree::MercadoPago::CustomClient::Resource
   def build_create_params(amount, card_token, description, installments, payment_method_id, payer_email)
     {
         transaction_amount: amount,
