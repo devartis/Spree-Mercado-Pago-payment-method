@@ -1,5 +1,5 @@
 module Spree
-  class MercadoPagoCustomSource
+  class MercadoPagoCustomSource < ActiveRecord::Base
 
   end
 end
