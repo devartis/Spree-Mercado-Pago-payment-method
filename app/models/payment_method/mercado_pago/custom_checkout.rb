@@ -8,7 +8,7 @@ class PaymentMethod::MercadoPago::CustomCheckout < Spree::PaymentMethod
 
   scope :active, -> { where(active: true) }
 
-  include ::Concerns::MercadoPago::CustomCheckout::PaymentIntegration
+  include ::MercadoPago::CustomCheckout::PaymentIntegration
 
   def payment_source_class
     ::MercadoPago::CustomCheckout::Source
