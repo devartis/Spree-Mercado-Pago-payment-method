@@ -32,7 +32,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     ::Spree::MercadoPagoCustomSource
   end
 
-  def provider_source_class
+  def provider_class
     ::Spree::MercadoPago::CustomClient
   end
 
