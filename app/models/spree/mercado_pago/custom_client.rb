@@ -10,7 +10,7 @@ module Spree
       end
 
       def payments
-        CustomClient::Payments.new(self.client)
+        CustomClient::Payment.new(self.client)
       end
     end
   end
