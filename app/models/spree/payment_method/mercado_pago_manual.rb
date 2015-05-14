@@ -22,7 +22,7 @@ class Spree::PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
   end
 
   def payment_source_class
-    MercadoPagoManualSource
+    Spree::MercadoPagoManualSource
   end
 
   def authorize(amount, source, gateway_options)
@@ -30,7 +30,7 @@ class Spree::PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
     money_request = provider.create_money_request(source.payer_email, formatted_amount, source.description)
     status = money_request['status']
     source.update!(mercado_pago_id: money_request['id'].try(:to_i), external_reference: money_request['external_reference'])
-    success = !MercadoPago::MoneyRequestStatus.failed?(status)
+    success = !Spree::MercadoPago::MoneyRequestStatus.failed?(status)
     ActiveMerchant::Billing::Response.new(success, 'MercadoPagoMoneyRequest payment authorized', {status: status})
   end
 
@@ -39,11 +39,11 @@ class Spree::PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
   # If the money_request_status is cancelled or rejected (#failed?), then capture
   def try_capture(payment)
     money_request_status = provider.get_money_request_status(payment.source.mercado_pago_id)
-    if can_capture?(payment) and not MercadoPago::MoneyRequestStatus.pending?(money_request_status)
+    if can_capture?(payment) and not Spree::MercadoPago::MoneyRequestStatus.pending?(money_request_status)
       payment_status = provider.get_payment_status payment.source.external_reference
-      if MercadoPago::MoneyRequestStatus.failed? money_request_status or
-          (MercadoPago::MoneyRequestStatus.accepted? money_request_status and
-              not MercadoPago::PaymentStatus.pending? payment_status)
+      if Spree::MercadoPago::MoneyRequestStatus.failed? money_request_status or
+          (Spree::MercadoPago::MoneyRequestStatus.accepted? money_request_status and
+              not Spree::MercadoPago::PaymentStatus.pending? payment_status)
         begin
           payment.capture!
         rescue ::Spree::Core::GatewayError => e
@@ -55,10 +55,10 @@ class Spree::PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
 
   def capture(amount, source, gateway_options)
     money_request_status = provider.get_money_request_status source.mercado_pago_id
-    success = MercadoPago::MoneyRequestStatus.accepted?(money_request_status)
+    success = Spree::MercadoPago::MoneyRequestStatus.accepted?(money_request_status)
     if success
       payment_status = provider.get_payment_status payment.source.external_reference
-      success &&= MercadoPago::PaymentStatus.approved?(payment_status)
+      success &&= Spree::MercadoPago::PaymentStatus.approved?(payment_status)
       ActiveMerchant::Billing::Response.new(success, 'MercadoPago Money Request payment processed', {status: payment_status})
     else
       ActiveMerchant::Billing::Response.new(success, 'MercadoPago Money Request payment processed', {status: money_request_status})

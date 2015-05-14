@@ -34,7 +34,7 @@ module Spree
       end
 
       def create_preference_options(order, payment, callbacks)
-        builder = MercadoPago::OrderPreferencesBuilder.new order, payment, callbacks, payer_data
+        builder = ::Spree::MercadoPago::OrderPreferencesBuilder.new order, payment, callbacks, payer_data
 
         return builder.preferences_hash
       end
