@@ -14,6 +14,6 @@ class Spree::MercadoPago::CustomClient::Customer < Spree::MercadoPago::CustomCli
   private
 
   def customer_cards_endpoint(customer_id)
-    "#{self.resource_endpoint(customer_id)}/cards"
+    "#{self.endpoint(customer_id)}/cards"
   end
 end
