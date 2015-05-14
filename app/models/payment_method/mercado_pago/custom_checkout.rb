@@ -1,4 +1,5 @@
 class PaymentMethod::MercadoPago::CustomCheckout < Spree::PaymentMethod
+  preference :app_name, :string
   preference :public_key_production, :string
   preference :access_token_production, :string
   preference :public_key_sandbox, :string
