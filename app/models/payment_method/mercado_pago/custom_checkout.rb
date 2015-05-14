@@ -9,6 +9,10 @@ class PaymentMethod::MercadoPago::CustomCheckout < Spree::PaymentMethod
 
   include ::Concerns::MercadoPago::CustomCheckout::PaymentIntegration
 
+  def payment_source_class
+    ::MercadoPago::CustomCheckout::Source
+  end
+
   def auto_capture?
     true
   end
