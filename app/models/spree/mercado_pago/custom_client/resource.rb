@@ -6,23 +6,28 @@ class Spree::MercadoPago::CustomClient::Resource
     @version = version
   end
 
-  def endpoint
+  def collection_endpoint
     "/#{version}/#{self.class.name.demodulize.downcase.pluralize}"
   end
 
-  def get(*args)
-    client.get(endpoint, build_get_params(*args))
+  def resource_endpoint(id)
+    self.collection_endpoint + "/#{id}"
+  end
+
+  def get(id)
+    client.get(resource_endpoint(id))
+  end
+
+  def delete(id)
+    client.delete(resource_endpoint(id))
   end
 
   def create(*args)
-    client.post(endpoint, build_create_params(*args))
+    client.post(collection_endpoint, build_create_params(*args))
   end
 
-  def update(*args)
-    client.put(endpoint, build_update_params(*args))
+  def update(id, *args)
+    client.put(resource_endpoint(id), build_update_params(*args))
   end
 
-  def delete(*args)
-    client.delete(endpoint, build_delete_params(*args))
-  end
 end

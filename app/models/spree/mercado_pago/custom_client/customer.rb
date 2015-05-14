@@ -1,8 +1,6 @@
 class Spree::MercadoPago::CustomClient::Customer < Spree::MercadoPago::CustomClient::Resource
   def build_create_params(customer_email)
-    {
-        email: customer_email
-    }
+    {email: customer_email}
   end
 
   def associate_card(customer_id, token)
@@ -16,6 +14,6 @@ class Spree::MercadoPago::CustomClient::Customer < Spree::MercadoPago::CustomCli
   private
 
   def customer_cards_endpoint(customer_id)
-    self.endpoint + "/#{customer_id}/cards"
+    "#{self.resource_endpoint(customer_id)}/cards"
   end
 end
