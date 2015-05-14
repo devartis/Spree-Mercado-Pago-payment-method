@@ -8,21 +8,6 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
 
   scope :active, -> { where(active: true) }
 
-  def payment_source_class
-    ::Spree::MercadoPagoCustomSource
-  end
-
-  def purchase(amount, source, gateway_options)
-  end
-
-  def provider_source_class
-    ::Spree::MercadoPago::CustomClient
-  end
-
-  def provider
-    provider_class.new self.access_token
-  end
-
   def auto_capture?
     true
   end
@@ -41,5 +26,41 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     else
       preferred_access_token_production
     end
+  end
+
+  def payment_source_class
+    ::Spree::MercadoPagoCustomSource
+  end
+
+  def provider_source_class
+    ::Spree::MercadoPago::CustomClient
+  end
+
+  def provider
+    provider_class.new self.access_token
+  end
+
+  def purchase(amount, source, gateway_options)
+    description = 'Compra en Avalancha'
+    if source.integration_payment_method_id
+      # New card
+      hash = {payment_method_id: source.integration_payment_method_id, payer_email: gateway_options[:email]}
+      response = provider.payments.create(amount, source.card_token, description, source.installments, hash)
+      success = is_success?(response)
+    else
+      # Known card
+      user = Spree::User.find(gateway_options[:customer_id])
+      hash = {payer_id: user.mercado_pago_customer_id}
+      response = provider.payments.create(amount, source.card_token, description, source.installments, hash)
+      success = is_success?(response)
+    end
+
+    ActiveMerchant::Billing::Response.new(success, 'MercadoPago Custom Checkout Payment Processed', {})
+  end
+
+  private
+
+  def is_success?(response)
+    true
   end
 end
