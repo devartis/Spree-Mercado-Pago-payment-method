@@ -41,10 +41,10 @@ module Spree
 
       def payment_method
         @payment_method ||= if params[:payment_method_id]
-                              ::Spree::PaymentMethod::MercadoPago.find (params[:payment_method_id])
+                              ::Spree::PaymentMethod::MercadoPagoBasic.find (params[:payment_method_id])
                             else
                               # FIXME: This is not the best way. What happens with multiples MercadoPago payments?
-                              ::Spree::PaymentMethod::MercadoPago.first
+                              ::Spree::PaymentMethod::MercadoPagoBasic.first
                             end
       end
 
