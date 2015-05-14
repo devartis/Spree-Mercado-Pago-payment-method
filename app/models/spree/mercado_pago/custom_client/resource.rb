@@ -1,38 +1,28 @@
-module Spree
-  module MercadoPago
-    module CustomClient
-      class Resource
-        attr_accessor :client, :version
+class Spree::MercadoPago::CustomClient::Resource
+  attr_accessor :client, :version
 
-        def initialize(client, version = 'v1')
-          @client = client
-          @version = version
-        end
+  def initialize(client, version = 'v1')
+    @client = client
+    @version = version
+  end
 
-        def endpoint
-          "/#{version}/#{self.class.name.downcase}"
-        end
+  def endpoint
+    "/#{version}/#{self.class.name.downcase}"
+  end
 
-        def get(params)
-          client.get(endpoint, params)
-        end
+  def get(*args)
+    client.get(endpoint, build_get_params(*args))
+  end
 
-        def create(params)
-          client.post(endpoint, params)
-        end
+  def create(*args)
+    client.post(endpoint, build_create_params(*args))
+  end
 
-        def update(params)
-          client.put(endpoint, params)
-        end
+  def update(*args)
+    client.put(endpoint, build_update_params(*args))
+  end
 
-        def delete(params)
-          client.delete(endpoint, params)
-        end
-      end
-
-      class Payments < Resource
-
-      end
-    end
+  def delete(*args)
+    client.delete(endpoint, build_delete_params(*args))
   end
 end
