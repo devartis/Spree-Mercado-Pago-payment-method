@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :mercado_pago_payment_method, class: Spree::PaymentMethod::MercadoPago do
+  factory :mercado_pago_payment_method, class: Spree::PaymentMethod::MercadoPagoBasic do
     name "MercadoPago Payment Method"
   end
 
