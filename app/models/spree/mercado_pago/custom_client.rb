@@ -1,3 +1,5 @@
+require 'mercadopago'
+
 module Spree
   module MercadoPago
     class CustomClient
