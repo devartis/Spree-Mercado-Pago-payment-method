@@ -7,7 +7,7 @@ class Spree::MercadoPago::CustomClient::Resource
   end
 
   def endpoint
-    "/#{version}/#{self.class.name.downcase}"
+    "/#{version}/#{self.class.name.demodulize.downcase.pluralize}"
   end
 
   def get(*args)
