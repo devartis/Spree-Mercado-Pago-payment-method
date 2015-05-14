@@ -1,17 +1,13 @@
-class PaymentMethod::MercadoPagoCustomCheckout < Spree::PaymentMethod
+class PaymentMethod::MercadoPago::CustomCheckout < Spree::PaymentMethod
   preference :public_key_production, :string
   preference :access_token_production, :string
   preference :public_key_sandbox, :string
   preference :access_token_sandbox, :string
   preference :sandbox, :boolean, default: true
 
-  include ::Concerns::MercadoPago::CustomCheckoutIntegration
-
   scope :active, -> { where(active: true) }
 
-  def payment_source_class
-    nil
-  end
+  include ::Concerns::MercadoPago::CustomCheckout::PaymentIntegration
 
   def auto_capture?
     true
