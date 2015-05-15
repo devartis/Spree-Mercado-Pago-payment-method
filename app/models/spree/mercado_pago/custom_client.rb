@@ -16,6 +16,10 @@ module Spree
       def customers
         CustomClient::Customer.new(self.client)
       end
+
+      def payment_methods
+        CustomClient::PaymentMethod.new(self.client)
+      end
     end
   end
 end
