@@ -14,7 +14,7 @@ class Spree::MercadoPago::CustomClient::Resource
     endpoint
   end
 
-  def get(id)
+  def get(id = nil)
     do_get endpoint(id)
   end
 
