@@ -4,11 +4,11 @@ class Spree::MercadoPago::CustomClient::Customer < Spree::MercadoPago::CustomCli
   end
 
   def associate_card(customer_id, token)
-    HashWithIndifferentAccess.new client.post(customer_cards_endpoint(customer_id), {token: token})
+    do_post customer_cards_endpoint(customer_id), {token: token}
   end
 
   def get_cards(customer_id)
-    HashWithIndifferentAccess.new client.get(customer_cards_endpoint(customer_id))
+    do_get customer_cards_endpoint(customer_id)
   end
 
   private
