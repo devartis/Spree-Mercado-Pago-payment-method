@@ -61,6 +61,6 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   private
 
   def is_success?(response)
-    response[:status] == 'approved'
+    response[:response][:status] == 'approved'
   end
 end
