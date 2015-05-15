@@ -41,18 +41,24 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   end
 
   def purchase(amount, source, gateway_options)
+    email = gateway_options[:email]
+    mercado_pago_customer_id = provider.customer.find_or_create email
+    Spree::User.find(gateway_options[:customer_id]).update(mercado_pago_customer_id: mercado_pago_customer_id)
+    is_known_card = source.integration_payment_method_id.nil?
+
     description = 'Compra en Avalancha'
-    if source.integration_payment_method_id
-      # New card
-      hash = {payment_method_id: source.integration_payment_method_id, payer_email: gateway_options[:email]}
-      response = provider.payments.create(amount, source.card_token, description, source.installments, hash)
-      success = is_success?(response)
+
+    if is_known_card
+      hash = {payer_id: mercado_pago_customer_id}
     else
-      # Known card
-      user = Spree::User.find(gateway_options[:customer_id])
-      hash = {payer_id: user.mercado_pago_customer_id}
-      response = provider.payments.create(amount, source.card_token, description, source.installments, hash)
-      success = is_success?(response)
+      hash = {payment_method_id: source.integration_payment_method_id, payer_email: email}
+    end
+
+    response = provider.payments.create(amount, source.card_token, description, source.installments, hash)
+    success = is_success?(response)
+
+    if success and !is_known_card
+      provider.customer.associate_card(mercado_pago_customer_id, source.card_token)
     end
 
     ActiveMerchant::Billing::Response.new(success, 'MercadoPago Custom Checkout Payment Processed', {})
