@@ -7,7 +7,7 @@ class Spree::MercadoPago::CustomClient::Resource
   end
 
   def endpoint(id = nil)
-    endpoint = "/#{version}/#{self.class.name.demodulize.downcase.pluralize}"
+    endpoint = "/#{version}/#{self.class.name.demodulize.pluralize.underscore}"
     if id 
       endpoint = "#{endpoint}/#{id}"
     end
