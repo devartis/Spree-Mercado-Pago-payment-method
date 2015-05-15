@@ -15,19 +15,19 @@ class Spree::MercadoPago::CustomClient::Resource
   end
 
   def get(id)
-    client.get(endpoint(id))
+    HashWithIndifferentAccess.new client.get(endpoint(id))
   end
 
   def delete(id)
-    client.delete(endpoint(id))
+    HashWithIndifferentAccess.new client.delete(endpoint(id))
   end
 
   def create(*args)
-    client.post(endpoint, build_create_params(*args))
+    HashWithIndifferentAccess.new client.post(endpoint, build_create_params(*args))
   end
 
   def update(id, *args)
-    client.put(endpoint(id), build_update_params(*args))
+    HashWithIndifferentAccess.new client.put(endpoint(id), build_update_params(*args))
   end
 
 end
