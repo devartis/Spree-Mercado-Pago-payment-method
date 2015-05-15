@@ -22,6 +22,9 @@ module SpreeMercadoPagoPaymentMethod
 
     Spree::PermittedAttributes.source_attributes << :payer_email
     Spree::PermittedAttributes.source_attributes << :description
+    Spree::PermittedAttributes.source_attributes << :card_token
+    Spree::PermittedAttributes.source_attributes << :integration_payment_method_id
+    Spree::PermittedAttributes.source_attributes << :installments
 
     config.to_prepare &method(:activate).to_proc
   end
