@@ -14,6 +14,8 @@ module Spree
           credit_card_types_api_response = payment_method.provider.payment_methods.get
           @credit_card_types = present_credit_card_types(credit_card_types_api_response, false)
         end
+
+        render 'spree/api/credit_card_types/index'
       end
 
       def present_credit_card_types(api_response, has_installment_plans = false)
