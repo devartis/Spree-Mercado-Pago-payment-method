@@ -4,10 +4,10 @@ class Spree::MercadoPago::CustomClient::Customer < Spree::MercadoPago::CustomCli
   end
 
   def find_or_create(customer_email)
-    response = create(customer_email)[:response]
+    response = create(customer_email)
     if response and response[:error] and response[:cause].first[:code].to_i == 101
       saved_customer_response = do_get search_endpoint, params
-      saved_customer_response[:response][:id]
+      saved_customer_response[:id]
     else
       response[:id]
     end

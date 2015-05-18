@@ -33,19 +33,23 @@ class Spree::MercadoPago::CustomClient::Resource
   protected
 
   def do_get(*args)
-    HashWithIndifferentAccess.new client.get(*args)
+    extract_response client.get(*args)
   end
 
   def do_delete(*args)
-    HashWithIndifferentAccess.new client.delete(*args)
+    extract_response client.delete(*args)
   end
 
   def do_post(*args)
-    HashWithIndifferentAccess.new client.post(*args)
+    extract_response client.post(*args)
   end
 
   def do_put(*args)
-    HashWithIndifferentAccess.new client.put(*args)
+    extract_response client.put(*args)
+  end
+
+  def extract_response(response)
+    HashWithIndifferentAccess.new(response)[:response]
   end
 
 end

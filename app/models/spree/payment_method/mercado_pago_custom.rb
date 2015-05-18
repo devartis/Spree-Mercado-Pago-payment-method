@@ -54,7 +54,8 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
       hash = {payment_method_id: source.integration_payment_method_id, payer_email: email}
     end
 
-    response = provider.payments.create(amount, source.card_token, description, source.installments, hash)
+    formatted_amount = amount.to_f / 100
+    response = provider.payments.create(formatted_amount, source.card_token, description, source.installments, hash)
     success = is_success?(response)
 
     if success and !is_known_card
@@ -67,6 +68,6 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   private
 
   def is_success?(response)
-    response[:response][:status] == 'approved'
+    response[:status] == 'approved'
   end
 end

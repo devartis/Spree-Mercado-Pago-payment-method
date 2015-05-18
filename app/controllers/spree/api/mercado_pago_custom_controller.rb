@@ -19,7 +19,7 @@ module Spree
       end
 
       def present_credit_card_types(api_response, has_installment_plans = false)
-        api_response = api_response[:response]
+        api_response = api_response
 
         if has_installment_plans
           api_response = api_response.group_by { |cct| cct[:payment_method_id] }
