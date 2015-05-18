@@ -42,7 +42,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
 
   def purchase(amount, source, gateway_options)
     email = gateway_options[:email]
-    mercado_pago_customer_id = provider.customer.find_or_create email
+    mercado_pago_customer_id = provider.customers.find_or_create email
     Spree::User.find(gateway_options[:customer_id]).update(mercado_pago_customer_id: mercado_pago_customer_id)
     is_known_card = source.integration_payment_method_id.nil?
 
@@ -58,7 +58,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     success = is_success?(response)
 
     if success and !is_known_card
-      provider.customer.associate_card(mercado_pago_customer_id, source.card_token)
+      provider.customers.associate_card(mercado_pago_customer_id, source.card_token)
     end
 
     ActiveMerchant::Billing::Response.new(success, 'MercadoPago Custom Checkout Payment Processed', {})
