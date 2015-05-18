@@ -7,13 +7,4 @@ FactoryGirl.define do
     state 'checkout'
     response_code '12345'
   end
-
-  factory :mp_custom_payment, class: Spree::Payment do
-    amount 200
-    association(:payment_method, factory: :mercado_pago_custom_payment_method)
-    association(:source, factory: :mercado_pago_custom_source)
-    order
-    state 'checkout'
-    response_code '12345'
-  end
 end

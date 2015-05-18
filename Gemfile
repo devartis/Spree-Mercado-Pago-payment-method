@@ -24,7 +24,6 @@ group :development, :test do
   gem 'ffaker'
   gem 'factory_girl'
   gem 'factory_girl_rails'
-  gem 'vcr'
 end
 
 group :development do

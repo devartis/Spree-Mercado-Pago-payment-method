@@ -7,7 +7,6 @@
 require 'rubygems'
 require 'webmock/rspec'
 require 'webmock/api'
-require 'vcr'
 
 ENV['RAILS_ENV'] = 'test'
 # Configure Rails Environment
@@ -29,12 +28,6 @@ require 'spree/testing_support/url_helpers'
 # Rails engines something like this to make Factory Girl work
 
 Dir[File.join(File.dirname(__FILE__), 'factories/**/*.rb')].each { |f| require f }
-
-VCR.configure do |config|
-  config.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
-  config.hook_into :webmock # or :fakeweb
-  config.configure_rspec_metadata!
-end
 
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
