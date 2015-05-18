@@ -1,6 +1,6 @@
 class Spree::MercadoPago::CreditCardTypePresenter
   extend Forwardable
-  attr_accessor :name, :code, :mp_code, :financial_corporations
+  attr_accessor :name, :code, :mp_code, :financial_corporations, :credit_card_type
   attr_accessor :has_installment_plans
 
   def initialize(api_response, has_installment_plans = false)
@@ -14,12 +14,16 @@ class Spree::MercadoPago::CreditCardTypePresenter
       financial_corporations = nil
     end
 
-    credit_card_type = get_credit_card_type(@mp_code)
+    @credit_card_type = get_credit_card_type(@mp_code)
 
-    @id = credit_card_type.id
-    @code = credit_card_type.code
-    @name = credit_card_type.name
-    @financial_corporations = present_financial_corporations(financial_corporations)
+    if @credit_card_type
+      @id = @credit_card_type.id
+      @code = @credit_card_type.code
+      @name = @credit_card_type.name
+      @financial_corporations = present_financial_corporations(financial_corporations)
+    else
+      @financial_corporations = []
+    end
 
   end
 
