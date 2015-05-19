@@ -15,7 +15,7 @@ Spree::Core::Engine.routes.draw do
       end
     end
     resources :users do
-      get 'mercado_pago_cards', to: 'mercado_pago_custom#cards', as: :mercado_pago_cards_api
+      get 'cards', to: 'mercado_pago_custom#cards', as: :mercado_pago_cards_api
     end
 
   end
