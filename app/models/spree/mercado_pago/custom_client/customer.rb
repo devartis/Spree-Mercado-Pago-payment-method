@@ -8,7 +8,7 @@ class Spree::MercadoPago::CustomClient::Customer < Spree::MercadoPago::CustomCli
   def find_or_create(customer_email)
     response = create(customer_email)
     if response and response[:error] and response[:error][:cause].first[:code].to_i == CUSTOMER_ALREADY_EXISTS_CODE
-      saved_customer_response = do_get search_endpoint, build_create_params(customer_email)
+      saved_customer_response = search(customer_email)
       saved_customer_response[:id]
     else
       response[:id]
@@ -16,7 +16,8 @@ class Spree::MercadoPago::CustomClient::Customer < Spree::MercadoPago::CustomCli
   end
 
   def associate_card(customer_id, token)
-    do_post customer_cards_endpoint(customer_id), {token: token}
+    response = do_post customer_cards_endpoint(customer_id), {token: token}
+    !response[:id].nil?
   end
 
   def get_cards(customer_id)
@@ -24,6 +25,10 @@ class Spree::MercadoPago::CustomClient::Customer < Spree::MercadoPago::CustomCli
   end
 
   private
+
+  def search(customer_email)
+    do_get(search_endpoint, build_create_params(customer_email))[:results].first
+  end
 
   def customer_cards_endpoint(customer_id)
     "#{self.endpoint(customer_id)}/cards"
