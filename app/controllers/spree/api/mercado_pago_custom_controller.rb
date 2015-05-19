@@ -2,7 +2,7 @@ module Spree
   module Api
     class MercadoPagoCustomController < BaseController
       before_filter :find_order, only: :installment_plans
-      before_filter :find_payment_method, only: :installment_plans
+      before_filter :find_payment_method, only: [:installment_plans, :cards]
 
       def installment_plans
         mp_payment_method_id = params[:mp_payment_method_id]
