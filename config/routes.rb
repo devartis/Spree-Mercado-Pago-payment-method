@@ -14,6 +14,9 @@ Spree::Core::Engine.routes.draw do
         get 'mercado_pago/notification', to: 'mercado_pago#notification', as: :mercado_pago_notification_get
       end
     end
+    resources :users do
+      get 'mercado_pago_cards', to: 'mercado_pago_custom#cards', as: :mercado_pago_cards_api
+    end
 
   end
 
