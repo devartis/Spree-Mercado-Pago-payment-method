@@ -24,16 +24,11 @@ group :development, :test do
   gem 'ffaker'
   gem 'factory_girl'
   gem 'factory_girl_rails'
+  gem 'therubyracer'
 end
 
 group :development do
   gem 'annotate', '>=2.6.0'
-  unless ENV['RM_INFO']
-    gem 'pry-debugger'
-    gem 'pry-rails'
-    gem 'pry-rescue'
-    gem 'pry-stack_explorer'
-  end
 end
 
 gemspec

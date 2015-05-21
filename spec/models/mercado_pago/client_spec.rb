@@ -112,12 +112,6 @@ describe MercadoPago::Client do
         response = client.create_preferences(preferences)
         response.should_not be_nil
       end
-
-      it '#redirect_url returns offsite checkout url' do
-        client.create_preferences preferences
-        client.redirect_url.should be_present
-        client.redirect_url.should eq('https://www.mercadopago.com/checkout/pay?pref_id=identificador_de_la_preferencia')
-      end
     end
 
     context 'on failure' do

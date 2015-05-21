@@ -1,9 +1,5 @@
 class MercadoPago::Client
   module API
-    def redirect_url
-      point_key = sandbox ? 'sandbox_init_point' : 'init_point'
-      @preferences_response[point_key] if @preferences_response.present?
-    end
 
   private
 
