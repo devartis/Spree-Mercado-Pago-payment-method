@@ -47,7 +47,11 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
       mercado_pago_customer_id = user.mercado_pago_customer_id
     else
       mercado_pago_customer_id = provider.customers.find_or_create email
-      user.update(mercado_pago_customer_id: mercado_pago_customer_id)
+      if mercado_pago_customer_id
+        user.update(mercado_pago_customer_id: mercado_pago_customer_id)
+      else
+        Rails.logger.error("MercadoPago Custom - There was an error creating a MP customer for user #{user.id}")
+      end
     end
 
     is_known_card = source.integration_payment_method_id.nil?
@@ -67,7 +71,10 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     source.update(mercado_pago_id: response[:id], external_reference: response[:external_reference])
 
     if success and !is_known_card
-      provider.customers.associate_card(mercado_pago_customer_id, source.card_token)
+      associated = provider.customers.associate_card(mercado_pago_customer_id, source.card_token)
+      unless associated
+        Rails.logger.error("MercadoPago Custom - There was an error associating card for user #{user.id} with Mercado Pago Customer ID #{mercado_pago_customer_id}")
+      end
     end
 
     ActiveMerchant::Billing::Response.new(success, 'MercadoPago Custom Checkout Payment Processed', {})
