@@ -20,7 +20,12 @@ module Spree
 
       def cards
         mercado_pago_customer_id = current_api_user.mercado_pago_customer_id
-        render json: @payment_method.provider.customers.get_cards(mercado_pago_customer_id)
+        cards = @payment_method.provider.customers.get_cards(mercado_pago_customer_id)
+        if cards.is_a?(Array)
+          render json: {count: cards.count, cards: cards}
+        else
+          render json: {count: 0, cards: []}
+        end
       end
 
       private
