@@ -7,7 +7,7 @@ class Spree::MercadoPago::CustomClient::Customer < Spree::MercadoPago::CustomCli
 
   def find_or_create(customer_email)
     response = create(customer_email)
-    if response and response[:error] and response[:error][:cause].first[:code].to_i == CUSTOMER_ALREADY_EXISTS_CODE
+    if response and response[:cause] and response[:cause].first[:code].to_i == CUSTOMER_ALREADY_EXISTS_CODE
       saved_customer_response = search(customer_email)
       saved_customer_response[:id]
     else
