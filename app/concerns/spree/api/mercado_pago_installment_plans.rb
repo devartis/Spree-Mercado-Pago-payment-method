@@ -12,7 +12,7 @@ module Spree
           api_response = api_response.reject { |cct| cct[:status] != 'active' }
         end
         api_response.collect do |cct|
-          Spree::MercadoPago::CreditCardTypePresenter.new(cct, has_installment_plans)
+          ::Spree::MercadoPago::CreditCardTypePresenter.new(cct, has_installment_plans)
         end.reject do |cct|
           cct.credit_card_type.nil?
         end
