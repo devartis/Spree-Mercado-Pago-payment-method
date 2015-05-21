@@ -12,7 +12,7 @@ module Spree
         if mp_payment.source.nil? or mp_payment.source.redirect_url.nil?
           response = create_preferences mp_payment
           if response
-            point_key = sandbox ? 'sandbox_init_point' : 'init_point'
+            point_key = provider.sandbox ? 'sandbox_init_point' : 'init_point'
             redirect_url = response[point_key]
 
             mp_payment.source = MercadoPagoSource.create!

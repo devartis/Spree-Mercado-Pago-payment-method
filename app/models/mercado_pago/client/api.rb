@@ -1,7 +1,11 @@
 class MercadoPago::Client
   module API
 
-  private
+    def sandbox
+      @api_options[:sandbox]
+    end
+
+    private
 
     def notifications_url(mercado_pago_id)
       sandbox_part = sandbox ? 'sandbox/' : ''
@@ -26,10 +30,6 @@ class MercadoPago::Client
 
     def preferences_url(token)
       create_url 'https://api.mercadolibre.com/checkout/preferences', access_token: token
-    end
-
-    def sandbox
-      @api_options[:sandbox]
     end
 
     def get(url, request_options={}, options={})
