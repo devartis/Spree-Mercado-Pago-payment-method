@@ -4,6 +4,8 @@ module Spree
       before_filter :find_order, only: :installment_plans
       before_filter :find_payment_method, only: [:installment_plans, :cards]
 
+      include Spree::Api::MercadoPagoInstallmentPlans
+
       def installment_plans
         mp_payment_method_id = params[:mp_payment_method_id]
         @amount = @order.total_without_payment_adjustments
@@ -37,22 +39,6 @@ module Spree
       def find_payment_method
         @payment_method = Spree::PaymentMethod::MercadoPagoCustom.find params[:payment_method_id]
       end
-
-      def present_credit_card_types(api_response, has_installment_plans = false)
-        api_response = api_response
-
-        if has_installment_plans
-          api_response = api_response.group_by { |cct| cct[:payment_method_id] }
-        else
-          api_response = api_response.reject { |cct| cct[:status] != 'active' }
-        end
-        api_response.collect do |cct|
-          Spree::MercadoPago::CreditCardTypePresenter.new(cct, has_installment_plans)
-        end.reject do |cct|
-          cct.credit_card_type.nil?
-        end
-      end
-
     end
   end
 end
