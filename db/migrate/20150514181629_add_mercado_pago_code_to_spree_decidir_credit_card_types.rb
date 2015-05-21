@@ -4,7 +4,7 @@ class AddMercadoPagoCodeToSpreeDecidirCreditCardTypes < ActiveRecord::Migration
     
     klass = SpreeDecidir::CreditCardType
 
-    klass.create! name: 'Nativa Mastercard', decidir_code: 15, mercado_pago_code: 'nativa', code: 'NT'
+    klass.create! name: 'Nativa Mastercard', decidir_code: 99, mercado_pago_code: 'nativa', code: 'NT'
     klass.find(1).update!(mercado_pago_code: 'visa')
     klass.find(2).update!(mercado_pago_code: 'amex')
     klass.find(4).update!(mercado_pago_code: 'master')
