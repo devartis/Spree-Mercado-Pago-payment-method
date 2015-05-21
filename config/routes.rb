@@ -5,7 +5,7 @@ Spree::Core::Engine.routes.draw do
     resources :orders do
       member do
         post 'mercado_pago/payment', to: 'mercado_pago#payment', as: :mercado_pago_payment_api
-        get 'installment_plans/mercado_pago', to: 'mercado_pago_custom#installment_plans', as: :mercado_pago_installment_plans_api
+        get 'installment_plans/mercado_pago', to: 'mercado_pago_custom#installment_plans', as: :mercado_pago_installment_plans
       end
     end
     resources :payments do
@@ -15,7 +15,7 @@ Spree::Core::Engine.routes.draw do
       end
     end
     resources :users do
-      get 'cards', to: 'mercado_pago_custom#cards', as: :mercado_pago_cards_api
+      get 'cards', to: 'mercado_pago_custom#cards', as: :mercado_pago_cards
     end
 
   end
