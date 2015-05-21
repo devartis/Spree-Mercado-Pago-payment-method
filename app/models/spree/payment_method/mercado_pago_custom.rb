@@ -42,8 +42,14 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
 
   def purchase(amount, source, gateway_options)
     email = gateway_options[:email]
-    mercado_pago_customer_id = provider.customers.find_or_create email
-    Spree::User.find(gateway_options[:customer_id]).update(mercado_pago_customer_id: mercado_pago_customer_id)
+    user = Spree::User.find(gateway_options[:customer_id])
+    if user.mercado_pago_customer_id
+      mercado_pago_customer_id = user.mercado_pago_customer_id
+    else
+      mercado_pago_customer_id = provider.customers.find_or_create email
+      user.update(mercado_pago_customer_id: mercado_pago_customer_id)
+    end
+
     is_known_card = source.integration_payment_method_id.nil?
 
     description = 'Compra en Avalancha'
@@ -57,6 +63,8 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     formatted_amount = amount.to_f / 100
     response = provider.payments.create(formatted_amount, source.card_token, description, source.installments, hash)
     success = is_success?(response)
+
+    source.update(mercado_pago_id: response[:id], external_reference: response[:external_reference])
 
     if success and !is_known_card
       provider.customers.associate_card(mercado_pago_customer_id, source.card_token)
