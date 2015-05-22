@@ -5,7 +5,14 @@ Spree::Core::Engine.routes.draw do
     resources :orders do
       member do
         post 'mercado_pago/payment', to: 'mercado_pago#payment', as: :mercado_pago_payment_api
-        get 'installment_plans/mercado_pago', to: 'mercado_pago_custom#installment_plans', as: :mercado_pago_installment_plans
+      end
+    end
+    #HACK. Needed to be able to use the authorize method from spree
+    resources :orders, params: :order_id do
+      resource :installment_plans, only: [] do
+        member do
+          get 'mercado_pago', to: 'mercado_pago_custom#installment_plans'
+        end
       end
     end
     resources :payments do
