@@ -20,8 +20,8 @@ describe 'OrderPreferencesBuilder' do
   include ActionView::Helpers::SanitizeHelper
   include Spree::ProductsHelper
 
-  context 'Calling preferences_hash' do
-    subject { MercadoPago::OrderPreferencesBuilder.new(order, payment, callback_urls, payer_data).preferences_hash }
+  context "Calling preferences_hash" do
+    subject { Spree::MercadoPago::OrderPreferencesBuilder.new(order, payment, callback_urls, payer_data).preferences_hash }
 
     it 'should return external reference' do
       expect(subject).to include(external_reference:payment.identifier)

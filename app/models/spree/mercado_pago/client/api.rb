@@ -1,4 +1,4 @@
-class MercadoPago::Client
+class Spree::MercadoPago::Client
   module API
 
     def sandbox

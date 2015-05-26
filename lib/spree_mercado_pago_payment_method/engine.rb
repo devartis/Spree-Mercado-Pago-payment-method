@@ -15,12 +15,16 @@ module SpreeMercadoPagoPaymentMethod
     end
 
     initializer "spree_payment_network.register.payment_methods" do |app|
-      app.config.spree.payment_methods += [PaymentMethod::MercadoPago]
-      app.config.spree.payment_methods += [PaymentMethod::MercadoPagoManual]
+      app.config.spree.payment_methods += [Spree::PaymentMethod::MercadoPagoBasic]
+      app.config.spree.payment_methods += [Spree::PaymentMethod::MercadoPagoManual]
+      app.config.spree.payment_methods += [Spree::PaymentMethod::MercadoPagoCustom]
     end
 
     Spree::PermittedAttributes.source_attributes << :payer_email
     Spree::PermittedAttributes.source_attributes << :description
+    Spree::PermittedAttributes.source_attributes << :card_token
+    Spree::PermittedAttributes.source_attributes << :integration_payment_method_id
+    Spree::PermittedAttributes.source_attributes << :installments
 
     config.to_prepare &method(:activate).to_proc
   end

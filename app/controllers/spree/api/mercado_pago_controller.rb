@@ -43,17 +43,17 @@ module Spree
       end
 
       def create_preference_options(order, payment, callbacks)
-        builder = MercadoPago::OrderPreferencesBuilder.new order, payment, callbacks, payer_data
+        builder = ::Spree::MercadoPago::OrderPreferencesBuilder.new order, payment, callbacks, payer_data
 
         return builder.preferences_hash
       end
 
       def payment_method
         @payment_method ||= if params[:payment_method_id]
-                              ::PaymentMethod::MercadoPago.find (params[:payment_method_id])
+                              ::Spree::PaymentMethod::MercadoPagoBasic.find (params[:payment_method_id])
                             else
                               # FIXME: This is not the best way. What happens with multiples MercadoPago payments?
-                              ::PaymentMethod::MercadoPago.first
+                              ::Spree::PaymentMethod::MercadoPagoBasic.first
                             end
       end
 

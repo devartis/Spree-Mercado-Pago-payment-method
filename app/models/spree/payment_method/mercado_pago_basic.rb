@@ -1,5 +1,4 @@
-# -*- encoding : utf-8 -*-
-class PaymentMethod::MercadoPago < Spree::PaymentMethod
+class Spree::PaymentMethod::MercadoPagoBasic < Spree::PaymentMethod
 
   preference :client_id, :string
   preference :client_secret, :string
@@ -10,10 +9,10 @@ class PaymentMethod::MercadoPago < Spree::PaymentMethod
   preference :sandbox, :boolean, default: true
   preference :confirmation_url, :string, default: ''
 
-  include Provider
+  include ::Spree::MercadoPago::Provider
 
   def default_options
-    { sandbox: preferred_sandbox }
+    {sandbox: preferred_sandbox}
   end
 
   def payment_profiles_supported?
@@ -30,20 +29,20 @@ class PaymentMethod::MercadoPago < Spree::PaymentMethod
 
   def authorize(amount, source, gateway_options)
     status = provider.get_payment_status identifier(gateway_options[:order_id])
-    success = !MercadoPago::PaymentStatus.failed?(status)
+    success = !Spree::MercadoPago::PaymentStatus.failed?(status)
     ActiveMerchant::Billing::Response.new(success, 'MercadoPago payment authorized', {status: status})
   end
 
   def capture(amount, source, gateway_options)
     status = provider.get_payment_status identifier(gateway_options[:order_id])
-    success = MercadoPago::PaymentStatus.approved?(status)
+    success = Spree::MercadoPago::PaymentStatus.approved?(status)
     ActiveMerchant::Billing::Response.new(success, 'MercadoPago payment processed', {status: status})
   end
 
   def try_capture payment
     status = provider.get_payment_status payment.identifier
 
-    if can_capture?(payment) and not MercadoPago::PaymentStatus.pending?(status)
+    if can_capture?(payment) and not Spree::MercadoPago::PaymentStatus.pending?(status)
       # When the capture is not success, the payment raises a Core::GatewayError exception
       # See spree_core/app/models/spree/payment/processing.rb:156
       begin
@@ -56,7 +55,7 @@ class PaymentMethod::MercadoPago < Spree::PaymentMethod
 
   def payment_approved?(payment)
     status = provider.get_payment_status payment.identifier
-    MercadoPago::PaymentStatus.approved?(status)
+    Spree::MercadoPago::PaymentStatus.approved?(status)
   end
 
   def can_void?(payment)

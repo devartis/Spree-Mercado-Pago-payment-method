@@ -1,4 +1,4 @@
-class MercadoPago::MoneyRequestStatus
+class Spree::MercadoPago::MoneyRequestStatus
   def self.pending?(status)
     status == 'pending'
   end
