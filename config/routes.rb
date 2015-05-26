@@ -8,7 +8,7 @@ Spree::Core::Engine.routes.draw do
       end
     end
     #HACK. Needed to be able to use the authorize method from spree
-    resources :orders, params: :order_id do
+    resources :orders, param: :order_id do
       resource :installment_plans, only: [] do
         member do
           get 'mercado_pago', to: 'mercado_pago_custom#installment_plans'
