@@ -2,21 +2,21 @@ module Spree
   module MercadoPago
     class CreditCardTypePresenter
       extend Forwardable
-      attr_accessor :id, :name, :code, :mp_code, :financial_corporations, :credit_card_type
+      attr_accessor :id, :name, :code, :mercado_pago_code, :financial_corporations, :credit_card_type
       attr_accessor :has_installment_plans
 
       def initialize(api_response, has_installment_plans = false)
         @has_installment_plans = has_installment_plans
 
         if has_installment_plans
-          @mp_code = api_response.first
+          @mercado_pago_code = api_response.first
           financial_corporations = api_response.last
         else
-          @mp_code = api_response[:id]
+          @mercado_pago_code = api_response[:id]
           financial_corporations = nil
         end
 
-        @credit_card_type = get_credit_card_type(@mp_code)
+        @credit_card_type = get_credit_card_type(@mercado_pago_code)
 
         if @credit_card_type
           @id = @credit_card_type.id
