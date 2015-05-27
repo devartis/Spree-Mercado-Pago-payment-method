@@ -21,9 +21,11 @@ Spree::Core::Engine.routes.draw do
         get 'mercado_pago/notification', to: 'mercado_pago#notification', as: :mercado_pago_notification_get
       end
     end
-    resources :users do
-      get 'cards', to: 'mercado_pago_custom#cards', as: :mercado_pago_cards
-    end
+
+    # URGENT: This is breaking avalancha login!
+    #resources :users do
+    #  get 'cards', to: 'mercado_pago_custom#cards', as: :mercado_pago_cards
+    #end
 
   end
 
