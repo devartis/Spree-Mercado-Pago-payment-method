@@ -24,7 +24,7 @@ Spree::Core::Engine.routes.draw do
 
     # URGENT: This is breaking avalancha login!
     resources :users, only: [] do
-     get 'cards', to: 'mercado_pago_custom#cards', as: :mercado_pago_cards
+     get 'mercado_pago/cards', to: 'mercado_pago_custom#cards', as: :mercado_pago_cards
     end
 
   end
