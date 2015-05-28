@@ -32,7 +32,7 @@ module Spree
       private
 
       def find_payment_method
-        @payment_method = Spree::PaymentMethod::MercadoPagoCustom.find params[:payment_method_id]
+        @payment_method = Spree::PaymentMethod::MercadoPagoCustom.active.find params[:payment_method_id]
       end
     end
   end
