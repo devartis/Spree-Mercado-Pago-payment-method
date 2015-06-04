@@ -3,57 +3,26 @@ module Spree
     class CreditCardTypePresenter
       extend Forwardable
       attr_accessor :id, :name, :code, :mercado_pago_code, :financial_corporations, :credit_card_type
-      attr_accessor :has_installment_plans
 
-      def initialize(api_response, has_installment_plans = false)
-        @has_installment_plans = has_installment_plans
+      def initialize(api_response, financial_corporations = [])
+        @mercado_pago_code = api_response[:id]
 
-        if has_installment_plans
-          @mercado_pago_code = api_response.first
-          financial_corporations = api_response.last
-        else
-          @mercado_pago_code = api_response[:id]
-          financial_corporations = nil
-        end
-
-        @credit_card_type = get_credit_card_type(@mercado_pago_code)
+        @credit_card_type = SpreeDecidir::CreditCardType.find_by(mercado_pago_code: @mercado_pago_code)
 
         if @credit_card_type
           @id = @credit_card_type.id
           @code = @credit_card_type.code
           @name = @credit_card_type.name
-          @financial_corporations = present_financial_corporations(financial_corporations)
-        else
-          @financial_corporations = []
         end
 
+        @financial_corporations = present_financial_corporations(financial_corporations)
       end
 
-      private
-
-      def get_mercado_pago_code(mp_credit_card_type)
-        unless has_installment_plans
-          mp_credit_card_type[:id]
-        else
-          mp_credit_card_type[:payment_method_id]
-        end
-      end
-
-      def get_credit_card_type(mp_code)
-        SpreeDecidir::CreditCardType.find_by(mercado_pago_code: mp_code)
-      end
-
-      def present_financial_corporations(financial_corporations = nil)
-        if @has_installment_plans
-          financial_corporations.map do |cct|
-            obj = cct[:issuer]
-            obj[:installment_plans] = cct[:payer_costs]
-            obj
-          end.collect do |financial_corporation|
-            Spree::MercadoPago::FinancialCorporationPresenter.new(financial_corporation)
-          end
-        else
-          []
+      def present_financial_corporations(financial_corporations)
+        financial_corporations.collect do |info|
+          financial_corporation = info[:issuer]
+          financial_corporation[:installment_plans] = info[:payer_costs]
+          FinancialCorporationPresenter.new(financial_corporation)
         end
       end
     end

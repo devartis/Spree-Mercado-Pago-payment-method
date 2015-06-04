@@ -5,8 +5,8 @@ module Spree
       attr_accessor :id, :name, :code, :image, :installment_plans, :best_plan
 
       def initialize(financial_corporation)
-        @id = ''
-        @code = ''
+        @id = nil
+        @code = nil
         @image = financial_corporation[:thumbnail]
         @name = financial_corporation[:name]
         @installment_plans = financial_corporation[:installment_plans].collect do |ip|

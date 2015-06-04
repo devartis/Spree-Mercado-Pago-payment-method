@@ -3,18 +3,19 @@ module Spree
     module MercadoPagoInstallmentPlans
       extend ActiveSupport::Concern
 
-      def present_credit_card_types(api_response, has_installment_plans = false)
-        api_response = api_response
-
-        if has_installment_plans
-          api_response = api_response.group_by { |cct| cct[:payment_method_id] }
-        else
-          api_response = api_response.reject { |cct| cct[:status] != 'active' }
+      def present_credit_card_types(payment_methods, options = {})
+        active_credit_cards = payment_methods.reject do |payment_method|
+          payment_method[:status] != 'active' or payment_method[:payment_type_id] != 'credit_card'
         end
-        api_response.collect do |cct|
-          ::Spree::MercadoPago::CreditCardTypePresenter.new(cct, has_installment_plans)
-        end.reject do |cct|
-          cct.credit_card_type.nil?
+
+        payment_method = options[:payment_method]
+
+        active_credit_cards.collect do |credit_card|
+          if payment_method and payment_method[:id]== credit_card[:id]
+            ::Spree::MercadoPago::CreditCardTypePresenter.new(credit_card, payment_method[:financial_corporations])
+          else
+            ::Spree::MercadoPago::CreditCardTypePresenter.new(credit_card)
+          end
         end
       end
     end
