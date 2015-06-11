@@ -53,7 +53,7 @@ module Concerns
     end
 
     def payment_by(payment_identifier)
-      @current_payment ||= Spree::Payment.find_by identifier: payment_identifier
+      @current_payment ||= ::Spree::Payment.find_by identifier: payment_identifier
     end
 
   end
