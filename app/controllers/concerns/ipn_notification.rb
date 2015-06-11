@@ -8,7 +8,7 @@ module Concerns
     end
 
     def notification
-      authorize! :ipn_notification, Spree::Order if api_key
+      authorize! :ipn_notification, ::Spree::Order if api_key
       external_reference = provider.get_external_reference operation_number
 
       if external_reference
