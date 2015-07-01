@@ -53,8 +53,9 @@ class Spree::PaymentMethod::MercadoPagoManual < Spree::PaymentMethod
     end
   end
 
-  def capture(amount, source, gateway_options)
-    money_request_status = provider.get_money_request_status source.mercado_pago_id
+  def capture(amount, response_code, gateway_options)
+    payment = Spree::Payment.find_by identifier: identifier(gateway_options[:order_id])
+    money_request_status = provider.get_money_request_status(payment.source.mercado_pago_id)
     success = Spree::MercadoPago::MoneyRequestStatus.accepted?(money_request_status)
     if success
       payment_status = provider.get_payment_status payment.source.external_reference
