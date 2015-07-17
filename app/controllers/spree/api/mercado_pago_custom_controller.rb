@@ -2,6 +2,7 @@ module Spree
   module Api
     class MercadoPagoCustomController < BaseController
       before_filter :find_payment_method, only: [:installment_plans, :cards]
+      before_filter :find_order, only: :installment_plans
 
       include Spree::Api::MercadoPagoInstallmentPlans
 
@@ -33,6 +34,12 @@ module Spree
       end
 
       private
+
+      private
+
+      def find_order
+        @order = Spree::Order.find_by!(number: params[:id])
+      end
 
       def find_payment_method
         @payment_method = if params[:payment_method_id]

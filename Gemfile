@@ -13,9 +13,8 @@ gem 'mercadopago-sdk'
 
 group :test do
   gem 'webmock'
-  gem 'guard-rspec', '~> 4.0.0'
   gem 'capybara'
-  gem 'rspec-rails', '~> 2.99.0'
+  gem 'rspec-rails', '~> 2.14'
 end
 
 group :development, :test do
