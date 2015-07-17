@@ -38,7 +38,7 @@ module Spree
       private
 
       def find_order
-        @order = Spree::Order.find_by!(number: params[:id])
+        @order = Spree::Order.find_by!(number: params[:order_id])
       end
 
       def find_payment_method
