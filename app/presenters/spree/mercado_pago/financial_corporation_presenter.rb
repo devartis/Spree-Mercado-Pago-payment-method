@@ -7,7 +7,7 @@ module Spree
       def initialize(financial_corporation)
         @id = ''
         @code = ''
-        @image = financial_corporation[:thumbnail]
+        @image = financial_corporation[:secure_thumbnail]
         @name = financial_corporation[:name]
         @installment_plans = financial_corporation[:installment_plans].collect do |ip|
           SpreeDecidir::InstallmentPlan.new discount_percentage: ip[:disccount_rate].to_f, interest_percentage: ip[:installment_rate].to_f, installments: ip[:installments]
