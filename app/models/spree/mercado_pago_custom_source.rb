@@ -12,7 +12,7 @@
 
 module Spree
   class MercadoPagoCustomSource < ActiveRecord::Base
-    enum document_type: [ :dni, :ci, :le, :lc ]
+    enum document_type: {dni: 1, ci: 2, le: 3, lc: 4}
     belongs_to :payment_method
     belongs_to :user
     has_many :payments, as: :source, class_name: '::Spree::Payment'
