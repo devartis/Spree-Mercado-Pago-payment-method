@@ -11,14 +11,16 @@ module Spree
         @amount = @order.total_without_payment_adjustments
         mercado_pago_payment_methods = @payment_method.provider.payment_methods.get
 
-        if mp_payment_method_id
-          installments_by_financial_corporation = @payment_method.provider.payment_methods.installment_plans(mp_payment_method_id, @amount)
-          @credit_card_types = present_credit_card_types(mercado_pago_payment_methods,
+        @credit_card_types = if mp_payment_method_id
+                               installments_by_financial_corporation = @payment_method.provider.payment_methods.installment_plans(mp_payment_method_id, @amount)
+                               present_credit_card_types(mercado_pago_payment_methods,
                                                          payment_method: {id: mp_payment_method_id,
                                                                           financial_corporations: installments_by_financial_corporation})
-        else
-          @credit_card_types = present_credit_card_types(mercado_pago_payment_methods)
-        end
+                             else
+                               present_credit_card_types(mercado_pago_payment_methods)
+                             end
+
+        @credit_card_types.reject! { |cc| !cc.found? }
 
         render 'spree/api/credit_card_types/index'
       end

@@ -13,10 +13,19 @@ module Spree
           @id = @credit_card_type.id
           @code = @credit_card_type.code
           @name = @credit_card_type.name
+        else
+          Rails.logger.error("MP Custom Checkout - No CreditCardType with mercado_pago_code \"#{@mercado_pago_code}\" was found.")
         end
 
         @financial_corporations = present_financial_corporations(financial_corporations)
       end
+
+      def found
+        !@id.nil?
+      end
+      alias_method :found?, :found
+
+      private
 
       def present_financial_corporations(financial_corporations)
         financial_corporations.collect do |info|
