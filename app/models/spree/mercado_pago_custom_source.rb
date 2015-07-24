@@ -16,5 +16,10 @@ module Spree
     belongs_to :payment_method
     belongs_to :user
     has_many :payments, as: :source, class_name: '::Spree::Payment'
+
+    def save_response_error(response)
+      cause = response[:cause].first
+      self.update!(error_code: cause[:code], failure_message: cause[:description])
+    end
   end
 end
