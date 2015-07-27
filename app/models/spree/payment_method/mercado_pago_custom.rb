@@ -66,7 +66,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
 
     formatted_amount = amount.to_f / 100
     response = provider.payments.create(formatted_amount, source.card_token, description, source.installments, hash)
-    success = is_success?(response)
+    success = is_success?(response) || is_pending?(response)
 
     if success
       source.update(mercado_pago_id: response[:id], external_reference: response[:external_reference])
@@ -89,4 +89,9 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   def is_success?(response)
     response[:status] == 'approved'
   end
+
+  def is_pending?(response)
+    response[:status] == 'in_process'
+  end
+
 end

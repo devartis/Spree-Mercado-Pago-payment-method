@@ -18,8 +18,14 @@ module Spree
     has_many :payments, as: :source, class_name: '::Spree::Payment'
 
     def save_response_error(response)
-      cause = response[:cause].first
-      error_code = cause[:code]
+      if response[:status_detail]
+        error_code = response[:status_detail]
+      elsif response[:cause]
+        cause = response[:cause].first
+        error_code = "e#{cause[:code]}"
+      else
+        error_code = 'default'
+      end
       self.update!(error_code: error_code, failure_message: description_for(error_code))
     end
 
@@ -27,7 +33,7 @@ module Spree
 
     def description_for(error_code)
       begin
-        return I18n.t("e#{error_code}", scope: 'mp_custom_errors', raise: true)
+        return I18n.t(error_code, scope: 'mp_custom_errors', raise: true)
       rescue I18n::MissingTranslationData
         return I18n.t('default', scope: 'mp_custom_errors')
       end
