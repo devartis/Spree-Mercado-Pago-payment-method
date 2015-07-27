@@ -77,6 +77,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
         end
       end
     else
+      Rails.logger.error("MercadoPago: Unable to create payment. Response #{response}")
       source.save_response_error(response)
     end
 
