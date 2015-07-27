@@ -19,7 +19,18 @@ module Spree
 
     def save_response_error(response)
       cause = response[:cause].first
-      self.update!(error_code: cause[:code], failure_message: cause[:description])
+      error_code = cause[:code]
+      self.update!(error_code: error_code, failure_message: description_for(error_code))
+    end
+
+    private
+
+    def description_for(error_code)
+      begin
+        return I18n.t("e#{error_code}", scope: 'mp_custom_errors', raise: true)
+      rescue I18n::MissingTranslationData
+        return I18n.t('default', scope: 'mp_custom_errors')
+      end
     end
   end
 end

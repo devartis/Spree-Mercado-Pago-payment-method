@@ -12,3 +12,15 @@ es:
 
     En cuanto su pago se concrete su pedido será finalizado.
   mp_invalid_order: "La órden especificada es inválida"
+  mp_custom_errors:
+    e106: "No puedes realizar pagos a usuarios de otros países."
+    e109: "payment_method_id no procesa pagos en installments cuotas. Elige otra tarjeta u otro medio de pago."
+    e126: "No pudimos procesar tu pago."
+    e129: "payment_method_id no procesa pagos del monto seleccionado. Elige otra tarjeta u otro medio de pago."
+    e145: "No pudimos procesar tu pago."
+    e150: "No puedes realizar pagos."
+    e151: "No puedes realizar pagos."
+    e160: "No pudimos procesar tu pago."
+    e204: "payment_method_id no está disponible en este momento. Elige otra tarjeta u otro medio de pago."
+    e801: "Realizaste un pago similar hace instantes. Intenta nuevamente en unos minutos."
+    default: "No pudimos procesar tu pago."
