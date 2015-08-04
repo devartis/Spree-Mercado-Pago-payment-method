@@ -9,7 +9,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   scope :active, -> { where(active: true) }
 
   def auto_capture?
-    true
+    false
   end
 
   def public_key
@@ -40,7 +40,27 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     provider_class.new self.access_token
   end
 
-  def purchase(amount, source, gateway_options)
+  def capture(amount, source, gateway_options)
+    identifier = identifier(gateway_options[:order_id])
+    payment = Spree::Payment.find_by! identifier: identifier
+
+    payment_info = get_payment_info(payment)
+    result = is_success?(payment_info)
+    ActiveMerchant::Billing::Response.new(result, 'MercadoPago Payment Processed', {})
+  end
+
+  def try_capture(payment)
+    payment_info = get_payment_info(payment)
+    unless is_pending?(payment_info)
+      begin
+        payment.capture!
+      rescue ::Spree::Core::GatewayError => e
+        Rails.logger.error e.message
+      end
+    end
+  end
+
+  def authorize(amount, source, gateway_options)
     email = gateway_options[:email]
     user = Spree::User.find(gateway_options[:customer_id])
     if user.mercado_pago_customer_id
@@ -81,10 +101,19 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
       source.save_response_error(response)
     end
 
-    ActiveMerchant::Billing::Response.new(success, 'MercadoPago Custom Checkout Payment Processed', {})
+    ActiveMerchant::Billing::Response.new(success, 'MercadoPago Custom Checkout Payment Authorized', {})
   end
 
   private
+
+  def get_payment_info(payment)
+    response = provider.payments.search({id: payment.source.mercado_pago_id})
+    if response[:results].empty?
+      {status: 'in_process'}
+    else
+      response[:results].first
+    end
+  end
 
   def is_success?(response)
     response[:status] == 'approved'
@@ -92,6 +121,10 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
 
   def is_pending?(response)
     response[:status] == 'in_process'
+  end
+
+  def identifier(order_id)
+    order_id.split('-').last
   end
 
 end
