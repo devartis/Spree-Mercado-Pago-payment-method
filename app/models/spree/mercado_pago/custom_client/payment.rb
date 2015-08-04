@@ -1,4 +1,8 @@
 class Spree::MercadoPago::CustomClient::Payment < Spree::MercadoPago::CustomClient::Resource
+  def search(params)
+    do_get '/v1/payments/search', params
+  end
+
   def build_create_params(amount, card_token, description, installments, options={})
     diff_params = if options.keys.size == 2 and options[:payment_method_id] and options[:payer_email]
                     {
