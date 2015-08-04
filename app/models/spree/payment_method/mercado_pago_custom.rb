@@ -1,4 +1,8 @@
 class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
+  APPROVED = 'approved'
+  PENDING = 'in_process'
+  REJECTED = 'rejected'
+
   preference :app_name, :string
   preference :public_key_production, :string
   preference :access_token_production, :string
@@ -46,6 +50,9 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
 
     payment_info = get_payment_info(payment)
     result = is_success?(payment_info)
+    unless result
+      payment.source.save_response_error(payment_info)
+    end
     ActiveMerchant::Billing::Response.new(result, 'MercadoPago Payment Processed', {})
   end
 
@@ -109,18 +116,18 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   def get_payment_info(payment)
     response = provider.payments.search({id: payment.source.mercado_pago_id})
     if response[:results].empty?
-      {status: 'in_process'}
+      {status: PENDING}
     else
       response[:results].first
     end
   end
 
   def is_success?(response)
-    response[:status] == 'approved'
+    response[:status] == APPROVED
   end
 
   def is_pending?(response)
-    response[:status] == 'in_process'
+    response[:status] == PENDING
   end
 
   def identifier(order_id)
