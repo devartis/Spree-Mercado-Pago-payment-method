@@ -41,7 +41,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   end
 
   def provider
-    provider_class.new self.access_token
+    provider_class.new self.access_token, self.public_key
   end
 
   def capture(amount, source, gateway_options)

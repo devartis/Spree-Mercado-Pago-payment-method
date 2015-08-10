@@ -1,8 +1,9 @@
 class Spree::MercadoPago::CustomClient::Resource
-  attr_accessor :client, :version
+  attr_accessor :client, :version, :public_key
 
-  def initialize(client, version = 'v1')
+  def initialize(client, public_key, version = 'v1')
     @client = client
+    @public_key = public_key
     @version = version
   end
 
@@ -33,19 +34,23 @@ class Spree::MercadoPago::CustomClient::Resource
   protected
 
   def do_get(*args)
-    extract_response client.get(*args)
+    do_request(:get, *args)
   end
 
   def do_delete(*args)
-    extract_response client.delete(*args)
+    do_request(:delete, *args)
   end
 
   def do_post(*args)
-    extract_response client.post(*args)
+    do_request(:post, *args)
   end
 
   def do_put(*args)
-    extract_response client.put(*args)
+    do_request(:put, *args)
+  end
+
+  def do_request(method, *args)
+    extract_response client.send(method, *args)
   end
 
   def extract_response(response)
