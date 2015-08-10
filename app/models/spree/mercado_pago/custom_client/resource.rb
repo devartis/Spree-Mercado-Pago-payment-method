@@ -33,20 +33,20 @@ class Spree::MercadoPago::CustomClient::Resource
 
   protected
 
-  def do_get(*args)
-    do_request(:get, *args)
+  def do_get(uri, params = nil, use_access_token = true)
+    do_request(:get, uri, params, use_access_token)
   end
 
-  def do_delete(*args)
-    do_request(:delete, *args)
+  def do_delete(uri, params = nil)
+    do_request(:delete, uri, params)
   end
 
-  def do_post(*args)
-    do_request(:post, *args)
+  def do_post(uri, data, params = nil)
+    do_request(:post, uri, data, params)
   end
 
-  def do_put(*args)
-    do_request(:put, *args)
+  def do_put(uri, data, params = nil)
+    do_request(:put, uri, data, params)
   end
 
   def do_request(method, *args)
