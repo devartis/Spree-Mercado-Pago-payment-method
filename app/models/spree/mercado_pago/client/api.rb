@@ -1,11 +1,11 @@
-class MercadoPago::Client
+class Spree::MercadoPago::Client
   module API
-    def redirect_url
-      point_key = sandbox ? 'sandbox_init_point' : 'init_point'
-      @preferences_response[point_key] if @preferences_response.present?
+
+    def sandbox
+      @api_options[:sandbox]
     end
 
-  private
+    private
 
     def notifications_url(mercado_pago_id)
       sandbox_part = sandbox ? 'sandbox/' : ''
@@ -15,6 +15,11 @@ class MercadoPago::Client
     def search_url
       sandbox_part = sandbox ? 'sandbox/' : ''
       "https://api.mercadolibre.com/#{sandbox_part}collections/search"
+    end
+
+    def money_request_url(mercado_pago_id = nil)
+      default_url = "https://api.mercadolibre.com/money_requests"
+      mercado_pago_id ? "#{default_url}/#{mercado_pago_id}" : default_url
     end
 
     def create_url(url, params={})
@@ -27,12 +32,16 @@ class MercadoPago::Client
       create_url 'https://api.mercadolibre.com/checkout/preferences', access_token: token
     end
 
-    def sandbox
-      @api_options[:sandbox]
-    end
-
     def get(url, request_options={}, options={})
       response = RestClient.get(url, request_options)
+      ActiveSupport::JSON.decode(response)
+    rescue => e
+      raise e unless options[:quiet]
+    end
+
+    def post(url, params={}, headers={}, options={})
+      params = params.to_json if ['application/json', :json].include? headers[:content_type]
+      response = RestClient.post url, params, headers
       ActiveSupport::JSON.decode(response)
     rescue => e
       raise e unless options[:quiet]

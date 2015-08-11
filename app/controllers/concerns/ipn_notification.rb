@@ -8,7 +8,7 @@ module Concerns
     end
 
     def notification
-      authorize! :ipn_notification, Spree::Order if api_key
+      authorize! :ipn_notification, ::Spree::Order if api_key
       external_reference = provider.get_external_reference operation_number
 
       if external_reference
@@ -53,7 +53,7 @@ module Concerns
     end
 
     def payment_by(payment_identifier)
-      @current_payment ||= Spree::Payment.find_by identifier: payment_identifier
+      @current_payment ||= ::Spree::Payment.find_by identifier: payment_identifier
     end
 
   end

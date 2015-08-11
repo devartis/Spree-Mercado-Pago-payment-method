@@ -8,14 +8,23 @@ module Spree
       # If the order is in 'payment' state, redirects to Mercado Pago Checkout page
       def payment
         mp_payment = @order.current_payment
-        mp_payment.source = MercadoPagoSource.create!
-        mp_payment.save!
 
-        if create_preferences(mp_payment)
-          render json: {redirect_url: provider.redirect_url, ok: true}
-        else
-          render json: {ok: false}
+        if mp_payment.source.nil? or mp_payment.source.redirect_url.nil?
+          response = create_preferences mp_payment
+          if response
+            point_key = provider.sandbox ? 'sandbox_init_point' : 'init_point'
+            redirect_url = response[point_key]
+
+            mp_payment.source = MercadoPagoSource.create!
+            mp_payment.source.redirect_url = redirect_url
+            mp_payment.save!
+          else
+            render json: {ok: false}
+            return
+          end
         end
+
+        render json: {redirect_url: mp_payment.source.redirect_url, ok: true}
       end
 
       private
@@ -27,24 +36,24 @@ module Spree
       def create_preferences(mp_payment)
         preferences = create_preference_options(@order, mp_payment, get_back_urls(mp_payment))
 
-        Rails.logger.info "Sending preferences to MercadoPago"
+        Rails.logger.info 'Sending preferences to MercadoPago'
         Rails.logger.info "#{preferences}"
 
         provider.create_preferences(preferences)
       end
 
       def create_preference_options(order, payment, callbacks)
-        builder = MercadoPago::OrderPreferencesBuilder.new order, payment, callbacks, payer_data
+        builder = ::Spree::MercadoPago::OrderPreferencesBuilder.new order, payment, callbacks, payer_data
 
         return builder.preferences_hash
       end
 
       def payment_method
         @payment_method ||= if params[:payment_method_id]
-                              ::PaymentMethod::MercadoPago.find (params[:payment_method_id])
+                              ::Spree::PaymentMethod::MercadoPagoBasic.find (params[:payment_method_id])
                             else
                               # FIXME: This is not the best way. What happens with multiples MercadoPago payments?
-                              ::PaymentMethod::MercadoPago.first
+                              ::Spree::PaymentMethod::MercadoPagoBasic.first
                             end
       end
 

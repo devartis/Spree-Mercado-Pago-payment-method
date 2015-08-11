@@ -1,4 +1,4 @@
-class MercadoPago::Client
+class Spree::MercadoPago::Client
   module Authentication
     def authenticate
       response = send_authentication_request

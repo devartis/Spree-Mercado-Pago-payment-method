@@ -9,13 +9,12 @@ gem 'spree_api'
 gem 'sass-rails'
 gem 'coffee-rails', '~> 4.0.0'
 gem 'spree_auth_devise', :git => 'https://github.com/spree/spree_auth_devise.git', :branch => '2-4-stable'
-
+gem 'mercadopago-sdk'
 
 group :test do
   gem 'webmock'
-  gem 'guard-rspec', '~> 4.0.0'
   gem 'capybara'
-  gem 'rspec-rails', '~> 2.14.0'
+  gem 'rspec-rails', '~> 2.14'
 end
 
 group :development, :test do
@@ -24,16 +23,11 @@ group :development, :test do
   gem 'ffaker'
   gem 'factory_girl'
   gem 'factory_girl_rails'
+  gem 'therubyracer'
 end
 
 group :development do
   gem 'annotate', '>=2.6.0'
-  unless ENV['RM_INFO']
-    gem 'pry-debugger'
-    gem 'pry-rails'
-    gem 'pry-rescue'
-    gem 'pry-stack_explorer'
-  end
 end
 
 gemspec

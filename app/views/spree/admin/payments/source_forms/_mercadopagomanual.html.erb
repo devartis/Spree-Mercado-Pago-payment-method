@@ -1,0 +1,10 @@
+<!-- Source form -->
+<% param_prefix = "payment_source[#{payment_method.id}]" %>
+<div class="field">
+  <%= label_tag 'payer_email', Spree.t(:payer_email) %>
+  <%= text_field_tag "#{param_prefix}[payer_email]", @order.email, class: 'required fullwidth' %>
+</div>
+<div class="field">
+  <%= label_tag 'description', Spree.t(:description) %>
+  <%= text_field_tag "#{param_prefix}[description]", '', class: 'required fullwidth' %>
+</div>

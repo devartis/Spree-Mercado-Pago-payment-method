@@ -1,0 +1,18 @@
+{
+  "id": 1234567,
+  "status": "pending",
+  "site_id": "Sitio del pago",
+  "currency_id": "Tipo de moneda",
+  "amount": 2.1,
+  "collector_id": "tu_identificador_como_vendedor",
+  "collector_email": "collector@email.com",
+  "payer_id": "identificador_de_tu_comprador",
+  "payer_email": "payer@email.com",
+  "description": "Descripción",
+  "concept_type": "off_platform",
+  "init_point": "URL-de-acceso-al-checkout",
+  "external_reference": "Reference_1234",
+  "pref_id": "identificador_de_la_preferencia",
+  "date_created": "2014-04-24T16:37:22.032-04:00",
+  "last_updated": "2014-04-24T16:37:22.032-04:00"
+}
