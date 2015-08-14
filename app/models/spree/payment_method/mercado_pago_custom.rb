@@ -45,8 +45,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   end
 
   def capture(amount, source, gateway_options)
-    identifier = identifier(gateway_options[:order_id])
-    payment = Spree::Payment.find_by! identifier: identifier
+    payment = get_payment(gateway_options)
 
     payment_info = get_payment_info(payment)
     result = is_success?(payment_info)
@@ -95,6 +94,11 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     response = provider.payments.create(formatted_amount, source.card_token, description, source.installments, hash)
     success = is_success?(response) || is_pending?(response)
 
+    if is_pending?(response)
+      payment = get_payment(gateway_options)
+      payment.order.update_attributes!(deliver_payment_confirmation: true)
+    end
+
     if success
       source.update(mercado_pago_id: response[:id], external_reference: response[:external_reference])
       unless is_known_card
@@ -112,6 +116,11 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   end
 
   private
+
+  def get_payment(gateway_options)
+    identifier = identifier(gateway_options[:order_id])
+    Spree::Payment.find_by! identifier: identifier
+  end
 
   def get_payment_info(payment)
     response = provider.payments.search({id: payment.source.mercado_pago_id})
