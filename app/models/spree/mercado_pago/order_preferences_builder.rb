@@ -17,12 +17,22 @@ module Spree
             external_reference: @payment.identifier,
             back_urls: @callback_urls,
             payer: @payer_data,
-            items: generate_items
+            items: generate_items,
+            payment_methods: generate_payment_methods
         }
       end
 
 
       private
+
+      def generate_payment_methods
+        pm = {}
+        pm.merge(excluded_payment_for_elockers) if @order.is_elocker?
+      end
+
+      def excluded_payment_for_elockers
+        { excluded_payment_types: [{id: 'ticket'}, {id: 'atm'}] }
+      end
 
       def generate_items
         items = []

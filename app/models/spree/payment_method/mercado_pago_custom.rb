@@ -94,10 +94,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     response = provider.payments.create(formatted_amount, source.card_token, description, source.installments, hash)
     success = is_success?(response) || is_pending?(response)
 
-    if is_pending?(response)
-      payment = get_payment(gateway_options)
-      payment.order.update_attributes!(deliver_payment_confirmation: true)
-    end
+    deliver_payment_confirmation(response, gateway_options)
 
     if success
       source.update(mercado_pago_id: response[:id], external_reference: response[:external_reference])
@@ -116,6 +113,16 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   end
 
   private
+
+  def deliver_payment_confirmation(response, gateway_options)
+    payment = get_payment(gateway_options)
+    order = payment.order
+    if order.respond_to?(:deliver_payment_confirmation?)
+      if is_pending?(response)
+        order.update_attributes!(deliver_payment_confirmation: true)
+      end
+    end
+  end
 
   def get_payment(gateway_options)
     identifier = identifier(gateway_options[:order_id])
