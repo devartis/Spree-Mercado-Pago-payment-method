@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'spree_core', '~> 2.4.0'
   s.add_dependency 'spree_api', '~> 2.4.0'
   s.add_dependency 'rest-client'
+  s.add_dependency 'mercadopago-sdk'
 
   s.test_files = Dir["spec/**/*"]
 end
