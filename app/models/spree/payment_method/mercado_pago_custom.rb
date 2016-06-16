@@ -46,16 +46,17 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     provider_class.new self.access_token, self.public_key
   end
 
-  def capture(amount, source, gateway_options)
+  def capture(amount, response_code, gateway_options)
     payment = get_payment(gateway_options)
+    source = payment.source
 
     payment_info = get_payment_info(payment)
     result = is_success?(payment_info)
     source.update(raw_response: payment_info)
     if result
-      payment.source.update(state: result[:status])
+      source.update(state: result[:status])
     else
-      payment.source.save_response_error(payment_info)
+      source.save_response_error(payment_info)
     end
 
     ActiveMerchant::Billing::Response.new(result, 'MercadoPago Payment Processed', {})
