@@ -195,7 +195,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
                             payer: {
                                 first_name: bill_address.firstname,
                                 last_name: bill_address.lastname,
-                                registration_data: order.user.created_at.to_s,
+                                registration_date: order.user.created_at.to_s,
                                 phone: {
                                     number: bill_address.phone
                                 },
