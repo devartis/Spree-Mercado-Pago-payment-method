@@ -54,7 +54,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     result = is_success?(payment_info)
     source.update(raw_response: payment_info)
     if result
-      source.update(state: result[:status])
+      source.update(state: payment_info[:status])
     else
       source.save_response_error(payment_info)
     end
