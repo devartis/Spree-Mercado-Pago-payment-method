@@ -10,7 +10,6 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   preference :access_token_sandbox, :string
   preference :sandbox, :boolean, default: true
   preference :statement_descriptor, :string, default: 'MERCADOPAGO'
-  preference :notification_url, :string, default: ''
   preference :send_additional_info, :boolean, default: false
 
   scope :active, -> { where(active: true) }
@@ -164,7 +163,6 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   def additional_info(order)
     default = {
         statement_descriptor: self.preferred_statement_descriptor,
-        notification_url: self.preferred_notification_url,
         external_reference: order.number
     }
     return default unless self.preferred_send_additional_info
