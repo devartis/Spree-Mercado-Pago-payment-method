@@ -8,7 +8,8 @@
 #  installments                     :integer
 #  document_type                    :integer          default(0)
 #  document_number                  :integer
-
+#  raw_response                     :text
+#  state                            :string(255)
 
 module Spree
   class MercadoPagoCustomSource < ActiveRecord::Base
@@ -16,6 +17,8 @@ module Spree
     belongs_to :payment_method
     belongs_to :user
     has_many :payments, as: :source, class_name: '::Spree::Payment'
+
+    serialize :raw_response, Hash
 
     def save_response_error(response)
       if response[:status_detail]
@@ -27,6 +30,14 @@ module Spree
         error_code = 'default'
       end
       self.update!(error_code: error_code, failure_message: description_for(error_code))
+    end
+
+    def approved?
+      self.state == 'approved'
+    end
+
+    def pending?
+      self.state == 'in_process'
     end
 
     private

@@ -9,6 +9,8 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   preference :public_key_sandbox, :string
   preference :access_token_sandbox, :string
   preference :sandbox, :boolean, default: true
+  preference :statement_descriptor, :string, default: 'MERCADOPAGO'
+  preference :send_additional_info, :boolean, default: false
 
   scope :active, -> { where(active: true) }
 
@@ -44,14 +46,19 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     provider_class.new self.access_token, self.public_key
   end
 
-  def capture(amount, source, gateway_options)
+  def capture(amount, response_code, gateway_options)
     payment = get_payment(gateway_options)
+    source = payment.source
 
     payment_info = get_payment_info(payment)
     result = is_success?(payment_info)
-    unless result
-      payment.source.save_response_error(payment_info)
+    source.update(raw_response: payment_info)
+    if result
+      source.update(state: payment_info[:status])
+    else
+      source.save_response_error(payment_info)
     end
+
     ActiveMerchant::Billing::Response.new(result, 'MercadoPago Payment Processed', {})
   end
 
@@ -67,8 +74,11 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   end
 
   def authorize(amount, source, gateway_options)
+    order = get_payment(gateway_options).order
     email = gateway_options[:email]
     user = Spree::User.find(gateway_options[:customer_id])
+
+    #Get MercadoPago Customer ID
     if user.mercado_pago_customer_id
       mercado_pago_customer_id = user.mercado_pago_customer_id
     else
@@ -80,18 +90,23 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
       end
     end
 
+    #Get payment options. If user uses a known card, we can just send the payer_id
     is_known_card = source.integration_payment_method_id.nil?
-
-    description = 'Compra en Avalancha'
-
     if is_known_card
-      hash = {payer_id: mercado_pago_customer_id}
+      payer_options = {payer_id: mercado_pago_customer_id}
     else
-      hash = {payment_method_id: source.integration_payment_method_id, payer_email: email}
+      payer_options = {payment_method_id: source.integration_payment_method_id, payer_email: email}
     end
 
+    description = order.line_items.map { |line_item| line_item.variant.name }.join(', ')
+    additional_info = additional_info(order)
     formatted_amount = amount.to_f / 100
-    response = provider.payments.create(formatted_amount, source.card_token, description, source.installments, hash)
+    response = provider.payments.create(formatted_amount, source.card_token, description, source.installments, additional_info, payer_options)
+    source.update(raw_response: response)
+    if response[:status].present?
+      source.update(state: response[:status])
+    end
+
     success = is_success?(response) || is_pending?(response)
 
     deliver_payment_confirmation(response, gateway_options)
@@ -148,6 +163,64 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
 
   def is_pending?(response)
     response[:status] == PENDING
+  end
+
+  def additional_info(order)
+    default = {
+        statement_descriptor: self.preferred_statement_descriptor,
+        external_reference: order.number
+    }
+    return default unless self.preferred_send_additional_info
+
+    begin
+      items = order.line_items.map do |line_item|
+        variant = line_item.variant
+        image = unless variant.images.empty?
+                  variant.images.first
+                else
+                  variant.product.images.first
+                end
+        {
+            id: variant.id,
+            title: variant.name,
+            #If image is extracted from product.images, it could be nil
+            picture_url: image ? image.attachment.url(:original) : '',
+            description: variant.description,
+            quantity: line_item.quantity,
+            unit_price: line_item.price.to_s
+        }
+      end
+      bill_address = order.bill_address
+      ship_address = order.ship_address
+      default.merge({
+                        additional_info: {
+                            items: items,
+                            payer: {
+                                first_name: bill_address.firstname,
+                                last_name: bill_address.lastname,
+                                registration_date: order.user.created_at.to_s,
+                                phone: {
+                                    number: bill_address.phone
+                                },
+                                address: {
+                                    street_name: bill_address.address1,
+                                    zip_code: bill_address.zipcode
+                                }
+                            },
+                            shipments: {
+                                receiver_address: {
+                                    zip_code: ship_address.zipcode,
+                                    street_name: ship_address.address1,
+                                    floor: ship_address.address2
+                                }
+                            }
+                        }
+                    })
+    rescue => e
+      #If additional info processing fails for some reason, we shouldn't avoid doing the payment.
+      Rails.logger.error "Exception raised while processing additional.info: #{e.message}"
+      default
+    end
   end
 
   def identifier(order_id)
