@@ -112,6 +112,10 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     ActiveMerchant::Billing::Response.new(success, 'MercadoPago Custom Checkout Payment Authorized', {})
   end
 
+  def cancel(response_code)
+    Rails.logger.info response_code
+  end
+
   private
 
   def deliver_payment_confirmation(response, gateway_options)
