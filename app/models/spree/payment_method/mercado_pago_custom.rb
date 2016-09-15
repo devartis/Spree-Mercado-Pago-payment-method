@@ -75,7 +75,8 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   end
 
   def authorize(amount, source, gateway_options)
-    order = get_payment(gateway_options).order
+    payment = get_payment(gateway_options)
+    order = payment.order
     email = gateway_options[:email]
     user = Spree::User.find(gateway_options[:customer_id])
 
@@ -100,7 +101,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     end
 
     description = order.line_items.map { |line_item| line_item.variant.name }.join(', ')
-    additional_info = additional_info(order)
+    additional_info = additional_info(order, payment)
     formatted_amount = amount.to_f / 100
     response = provider.payments.create(formatted_amount, source.card_token, description, source.installments, additional_info, payer_options)
     source.update(raw_response: response)
@@ -166,10 +167,10 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     response[:status] == PENDING
   end
 
-  def additional_info(order)
+  def additional_info(order, payment)
     default = {
         statement_descriptor: self.preferred_statement_descriptor,
-        external_reference: order.number
+        external_reference: payment.identifier
     }
     return default unless self.preferred_send_additional_info
 
