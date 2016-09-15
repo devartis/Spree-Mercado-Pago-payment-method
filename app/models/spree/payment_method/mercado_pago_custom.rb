@@ -54,6 +54,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
     result = is_success?(payment_info)
     source.update(raw_response: payment_info)
     if result
+      update_user_info(payment)
       source.update(state: payment_info[:status])
     else
       source.save_response_error(payment_info)
@@ -225,6 +226,18 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
 
   def identifier(order_id)
     order_id.split('-').last
+  end
+
+  def update_user_info(payment)
+    payment.reload
+    user = payment.order.user
+    payment_info = payment.source.raw_response
+    document = payment_info.try(:[], 'card').try(:[], 'cardholder').try(:[], 'identification').try(:[], 'number')
+
+    if document.present? and !user.document.present?
+      user.document = document
+      user.save
+    end
   end
 
 end
