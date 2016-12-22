@@ -8,7 +8,7 @@ module Spree
 
       def installment_plans
         mp_payment_method_id = params[:mp_payment_method_id]
-        @amount = @order.total_without_payment_adjustments
+        @amount = @order.total
         mercado_pago_payment_methods = @payment_method.provider.payment_methods.get
 
         @credit_card_types = if mp_payment_method_id
