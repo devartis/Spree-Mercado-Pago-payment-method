@@ -34,9 +34,9 @@ module Spree
         response = send_search_request({:external_reference => external_reference, :access_token => access_token})
 
         if response['results'].empty?
-          "pending"
+          'pending'
         else
-          response['results'][0]['collection']['status']
+          response['results'][0]['status']
         end
       end
 

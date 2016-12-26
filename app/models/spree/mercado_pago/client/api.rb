@@ -13,12 +13,12 @@ class Spree::MercadoPago::Client
     end
 
     def search_url
-      sandbox_part = sandbox ? 'sandbox/' : ''
-      "https://api.mercadolibre.com/#{sandbox_part}collections/search"
+      raise 'Search not implemented for Sandbox mode' if sandbox
+      'https://api.mercadopago.com/v1/payments/search'
     end
 
     def money_request_url(mercado_pago_id = nil)
-      default_url = "https://api.mercadolibre.com/money_requests"
+      default_url = 'https://api.mercadolibre.com/money_requests'
       mercado_pago_id ? "#{default_url}/#{mercado_pago_id}" : default_url
     end
 
