@@ -152,7 +152,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   end
 
   def get_payment_info(payment)
-    return NOT_FOUND if payment.source.mercado_pago_id.nil?
+    return {status: NOT_FOUND} if payment.source.mercado_pago_id.nil?
 
     response = provider.payments.search({id: payment.source.mercado_pago_id})
     if response[:results].empty?
