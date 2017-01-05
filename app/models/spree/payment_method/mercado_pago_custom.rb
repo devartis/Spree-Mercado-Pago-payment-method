@@ -2,6 +2,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   APPROVED = 'approved'
   PENDING = 'in_process'
   REJECTED = 'rejected'
+  NOT_FOUND = 'not_found'
 
   preference :app_name, :string
   preference :public_key_production, :string
@@ -65,7 +66,7 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
 
   def try_capture(payment)
     payment_info = get_payment_info(payment)
-    unless is_pending?(payment_info)
+    if !is_pending?(payment_info) or (not_found?(payment_info) && payment.created_at < 1.hour.ago)
       begin
         payment.capture!
       rescue ::Spree::Core::GatewayError => e
@@ -151,9 +152,11 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   end
 
   def get_payment_info(payment)
+    return NOT_FOUND if payment.source.mercado_pago_id.nil?
+
     response = provider.payments.search({id: payment.source.mercado_pago_id})
     if response[:results].empty?
-      {status: PENDING}
+      {status: NOT_FOUND}
     else
       response[:results].first
     end
@@ -164,7 +167,11 @@ class Spree::PaymentMethod::MercadoPagoCustom < Spree::PaymentMethod
   end
 
   def is_pending?(response)
-    response[:status] == PENDING
+    response[:status] == PENDING || response[:status] == NOT_FOUND
+  end
+
+  def not_found?(response)
+    response[:status] == NOT_FOUND
   end
 
   def additional_info(order, payment)
